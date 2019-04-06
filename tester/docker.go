@@ -1,7 +1,10 @@
 package tester
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os/exec"
 	"strconv"
 	"time"
@@ -10,17 +13,28 @@ import (
 	"github.com/pkg/errors"
 )
 
+const (
+	sendCodeExt  = "/loadcode"
+	sendStateExt = "/run"
+)
+
 type docker struct {
-	port   int
-	uuid   uuid.UUID
-	adress string
+	port            int
+	uuid            uuid.UUID
+	adress          string
+	sendCodeAdress  string
+	sendStateAdress string
 }
 
 func InitDocker(imgName string, port int, code string) (*docker, error) {
+	baseAdress := "http://127.0.0.1:" + strconv.Itoa(port)
 	newDocker := &docker{
-		port:   port,
-		adress: "127.0.0.1:" + strconv.Itoa(port),
+		port:            port,
+		adress:          baseAdress,
+		sendCodeAdress:  baseAdress + sendCodeExt,
+		sendStateAdress: baseAdress + sendStateExt,
 	}
+
 	var err error
 	newDocker.uuid, err = uuid.NewRandom()
 	if err != nil {
@@ -28,17 +42,19 @@ func InitDocker(imgName string, port int, code string) (*docker, error) {
 	}
 
 	fmt.Println("initing")
-	startDocker := exec.Command("docker", "run", "-p", "5000:"+strconv.Itoa(port), "--name", newDocker.uuid.String(), "-t", imgName)
+	startDocker := exec.Command("docker", "run", "-p", strconv.Itoa(port)+":5000", "--name", newDocker.uuid.String(), "-t", imgName)
 	err = startDocker.Start()
 	if err != nil {
 		return nil, errors.New(`failed to run "docker run"`)
 	}
 
+	ok := false
 	defer func(cmd *exec.Cmd, d *docker) {
 		//cmd.Process.Kill()
-		if !newDocker.IsUp() {
+		if !ok {
 			fmt.Println("defer closing")
 			newDocker.Kill()
+			startDocker.Process.Kill()
 		}
 	}(startDocker, newDocker)
 	timer := time.NewTimer(time.Second * 2)
@@ -64,19 +80,43 @@ func InitDocker(imgName string, port int, code string) (*docker, error) {
 		startDocker.Process.Kill()
 		newDocker.Kill()
 		return nil, errors.New("docker suddenly stopped")
-
 	}
-
 	fmt.Println("initited")
+
+	resp, err := newDocker.SendCode(code)
+	fmt.Println("docker response:", string(resp))
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to start docker")
+		return nil, errors.Wrap(err, "failed to send code")
 	}
 
+	ok = true
 	return newDocker, nil
 }
 
-func (d *docker) MakeRequest(request []byte) ([]byte, error) {
-	return request, nil
+func (d *docker) SendCode(code string) ([]byte, error) {
+	return d.SendRequest([]byte(`{"code":"`+code+`"}`), d.sendCodeAdress)
+}
+
+func (d *docker) SendState(state []byte) ([]byte, error) {
+	return d.SendRequest(state, d.sendStateAdress)
+}
+
+func (d *docker) SendRequest(request []byte, url string) ([]byte, error) {
+	if !d.IsUp() {
+		return nil, errors.New("docker is down")
+	}
+
+	resp, err := http.Post(url, "application/json", bytes.NewReader(request))
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to send request")
+	}
+
+	res, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to read response body")
+	}
+
+	return res, nil
 }
 
 func (d *docker) Kill() {

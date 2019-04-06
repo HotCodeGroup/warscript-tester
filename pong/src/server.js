@@ -22,7 +22,7 @@ const server = http.createServer((req, res) => {
             let params = JSON.parse(body)
             p = new Function("me", "enemy", "ball", params.code);
             res.setHeader("Content-Type", "application/json");
-            res.status= 200;
+            res.statusCode = 200;
             res.end(params.code)
         });
     } else if (req.method === 'POST' && req.url == run) {
@@ -63,9 +63,12 @@ const server = http.createServer((req, res) => {
             }
             p(me, enemy, ball)
 
-            let resp = JSON.stringify({"me":me, "enemy":enemy, "ball":ball})
-            res.setHeader("Content-Type", "application/json");
-            res.status(200);
+            let resp = JSON.stringify({
+                "me": me,
+                "enemy": enemy,
+                "ball": ball
+            })
+            res.setHeader('Content-Type', 'application/json');
             res.end(resp)
         });
     }

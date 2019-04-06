@@ -28,11 +28,11 @@ func Test(RawCode1, Rawcode2 string, game games.Game) (states []games.State, res
 	for {
 		st1, st2 := game.Snapshots()
 
-		resp1, err1 := docker1.MakeRequest(st1)
+		resp1, err1 := docker1.SendState(st1)
 		if err1 != nil {
 			returnErr = errors.Wrap(err1, "docker1 error")
 		}
-		resp2, err2 := docker2.MakeRequest(st2)
+		resp2, err2 := docker2.SendState(st2)
 		if err2 != nil {
 			returnErr = errors.Wrap(err1, "docker2 error")
 		}
