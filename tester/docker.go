@@ -68,8 +68,13 @@ func InitDocker(imgName string, port int, code string) (*docker, error) {
 	case <-timer.C:
 		// checking if docker container alive
 		if !newDocker.IsUp() {
-			startDocker.Process.Kill()
-			newDocker.Kill()
+			if err := startDocker.Process.Kill(); err != nil {
+				return nil, errors.Wrap(err, "time for docker launch is up: can not kill process")
+			}
+			if err := newDocker.Kill(); err != nil {
+				return nil, errors.Wrap(err, "time for docker launch is up: can not stop newDocker")
+			}
+
 			return nil, errors.New("time for docker launch is up")
 		}
 	case err, _ := <-ch:
@@ -77,8 +82,14 @@ func InitDocker(imgName string, port int, code string) (*docker, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "failed to start docker")
 		}
-		startDocker.Process.Kill()
-		newDocker.Kill()
+
+		if err := startDocker.Process.Kill(); err != nil {
+			return nil, errors.Wrap(err, "docker suddenly stopped: can not kill process")
+		}
+		if err := newDocker.Kill(); err != nil {
+			return nil, errors.Wrap(err, "docker suddenly stopped: can not stop newDocker")
+		}
+
 		return nil, errors.New("docker suddenly stopped")
 	}
 	fmt.Println("initited")
@@ -119,14 +130,18 @@ func (d *docker) SendRequest(request []byte, url string) ([]byte, error) {
 	return res, nil
 }
 
-func (d *docker) Kill() {
-	exec.Command("docker", "kill", d.uuid.String()).Run()
+func (d *docker) Kill() error {
+	return exec.Command("docker", "kill", d.uuid.String()).Run()
 }
 
-func KillDockers(ds ...*docker) {
-	for _, d := range ds {
-		d.Kill()
+func KillDockers(ds ...*docker) error {
+	for i, d := range ds {
+		if err := d.Kill(); err != nil {
+			return errors.Wrapf(err, "[%d] ", i)
+		}
 	}
+
+	return nil
 }
 
 func (d *docker) IsUp() bool {
