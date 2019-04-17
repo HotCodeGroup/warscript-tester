@@ -24,21 +24,16 @@ type Pong struct {
 	player1 Movable
 	player2 Movable
 
-	curShot1 shot
-	curShot2 shot
-
 	winner       int
 	isEnded      bool
 	occuredError *games.GameError
 }
 
 const (
-	fieldHeight  = 250
-	fieldWidth   = 500
-	playerHeight = 50
-	playerWidth  = 25
-	ballRad      = 10
-	image        = "pong"
+	fieldHeight = 250
+	fieldWidth  = 500
+	ballRad     = 10
+	image       = "pong"
 )
 
 // Init - inits game: sets default params
@@ -163,8 +158,8 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 	return nil
 }
 
-func (pong *Pong) GetState() (state State, fin bool) {
-	return State{
+func (pong *Pong) GetState() (state games.State, fin bool) {
+	return &State{
 		Player1: object2D{
 			X: pong.player1.x,
 			Y: pong.player1.y,
@@ -180,23 +175,25 @@ func (pong *Pong) GetState() (state State, fin bool) {
 	}, pong.isEnded
 }
 
-func (pong *Pong) GetResult() (result Result) {
+func (pong *Pong) GetResult() (result games.Result) {
 	if !pong.isEnded {
-		return
+		return nil
 	}
-	result.Winner = pong.winner
-	result.Error = pong.occuredError
-	result.Player1 = object2D{
-		X: pong.player1.x,
-		Y: pong.player1.y,
+
+	return &Result{
+		Winner: pong.winner,
+		Error:  pong.occuredError,
+		Player1: object2D{
+			X: pong.player1.x,
+			Y: pong.player1.y,
+		},
+		Player2: object2D{
+			X: pong.player2.x,
+			Y: pong.player2.y,
+		},
+		Ball: object2D{
+			X: pong.ball.x,
+			Y: pong.ball.y,
+		},
 	}
-	result.Player2 = object2D{
-		X: pong.player2.x,
-		Y: pong.player2.y,
-	}
-	result.Ball = object2D{
-		X: pong.ball.x,
-		Y: pong.ball.y,
-	}
-	return
 }

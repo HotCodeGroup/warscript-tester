@@ -16,7 +16,7 @@ type Game interface {
 	Init()
 	Images() (string, string)
 	Snapshots() (shot1, shot2 []byte)
-	SaveSnapshots(shot1, shot2 []byte) (gameErr *GameError)
+	SaveSnapshots(shot1, shot2 []byte) error
 	GetState() (state State, fin bool)
 	GetResult() (result Result)
 }
