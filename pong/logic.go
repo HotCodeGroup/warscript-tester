@@ -28,7 +28,7 @@ func (pong *Pong) loadSnapShots(s1 shot, s2 shot) {
 		pong.winner = 1
 		pong.isEnded = true
 	}
-	if res == p1Win {
+	if res == p2Win {
 		pong.winner = 2
 		pong.isEnded = true
 	}
