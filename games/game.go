@@ -16,7 +16,7 @@ type Game interface {
 	Init()
 	Images() (string, string)
 	Snapshots() (shot1, shot2 []byte)
-	SaveSnapshots(shot1, shot2 []byte) (gameErr GameError)
+	SaveSnapshots(shot1, shot2 []byte) (gameErr *GameError)
 	GetState() (state State, fin bool)
 	GetResult() (result Result)
 }
@@ -37,6 +37,6 @@ var (
 		msg: "player2 response was incorrect",
 	}
 	ErrInternal = &GameError{
-		msg: "player2 response was incorrect",
+		msg: "internal failure",
 	}
 )

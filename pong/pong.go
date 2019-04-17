@@ -24,8 +24,12 @@ type Pong struct {
 	player1 Movable
 	player2 Movable
 
-	winner  int
-	isEnded bool
+	curShot1 shot
+	curShot2 shot
+
+	winner       int
+	isEnded      bool
+	occuredError *games.GameError
 }
 
 const (
@@ -143,16 +147,56 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 	var s1, s2 shot
 	err1 := json.Unmarshal(shot1, s1)
 	if err1 != nil {
-		err1 = games.ErrPlayer1Fail
+		pong.isEnded = true
+		pong.occuredError = games.ErrPlayer1Fail
+		return games.ErrPlayer1Fail
 	}
 	err2 := json.Unmarshal(shot2, s2)
 	if err2 != nil {
-		err2 = games.ErrPlayer2Fail
+		pong.isEnded = true
+		pong.occuredError = games.ErrPlayer2Fail
+		return games.ErrPlayer2Fail
 	}
-	if err1 != nil || err2 != nil {
 
-	}
+	pong.loadSnapShots(s1, s2)
+
+	return nil
 }
 
-func (pong *Pong) GetState() (state State, fin bool) {}
-func (pong *Pong) GetResult() (result Result)        {}
+func (pong *Pong) GetState() (state State, fin bool) {
+	return State{
+		Player1: object2D{
+			X: pong.player1.x,
+			Y: pong.player1.y,
+		},
+		Player2: object2D{
+			X: pong.player2.x,
+			Y: pong.player2.y,
+		},
+		Ball: object2D{
+			X: pong.ball.x,
+			Y: pong.ball.y,
+		},
+	}, pong.isEnded
+}
+
+func (pong *Pong) GetResult() (result Result) {
+	if !pong.isEnded {
+		return
+	}
+	result.Winner = pong.winner
+	result.Error = pong.occuredError
+	result.Player1 = object2D{
+		X: pong.player1.x,
+		Y: pong.player1.y,
+	}
+	result.Player2 = object2D{
+		X: pong.player2.x,
+		Y: pong.player2.y,
+	}
+	result.Ball = object2D{
+		X: pong.ball.x,
+		Y: pong.ball.y,
+	}
+	return
+}
