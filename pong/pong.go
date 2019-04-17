@@ -145,13 +145,13 @@ func (pong *Pong) Snapshots() (shot1, shot2 []byte) {
 
 func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 	var s1, s2 shot
-	err1 := json.Unmarshal(shot1, s1)
+	err1 := json.Unmarshal(shot1, &s1)
 	if err1 != nil {
 		pong.isEnded = true
 		pong.occuredError = games.ErrPlayer1Fail
 		return games.ErrPlayer1Fail
 	}
-	err2 := json.Unmarshal(shot2, s2)
+	err2 := json.Unmarshal(shot2, &s2)
 	if err2 != nil {
 		pong.isEnded = true
 		pong.occuredError = games.ErrPlayer2Fail
