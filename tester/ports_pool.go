@@ -1,6 +1,8 @@
 package tester
 
-import "sync"
+import (
+	"sync"
+)
 
 type PortsPool struct {
 	mu    *sync.Mutex
@@ -11,37 +13,37 @@ func NewPortsPool() *PortsPool {
 	return &PortsPool{
 		mu: &sync.Mutex{},
 		ports: map[int]bool{
-			5001: false,
-			5002: false,
-			5003: false,
-			5004: false,
-			5005: false,
-			5006: false,
-			5007: false,
-			5008: false,
-			5009: false,
-			5010: false,
-			5011: false,
-			5012: false,
-			5013: false,
-			5014: false,
-			5015: false,
-			5016: false,
+			5001: true,
+			5002: true,
+			5003: true,
+			5004: true,
+			5005: true,
+			5006: true,
+			5007: true,
+			5008: true,
+			5009: true,
+			5010: true,
+			5011: true,
+			5012: true,
+			5013: true,
+			5014: true,
+			5015: true,
+			5016: true,
 		},
 	}
 }
 
 func (a *PortsPool) GetPort() int {
 	for {
+		a.mu.Lock()
 		for port, isFree := range a.ports {
 			if isFree {
-				a.mu.Lock()
-				a.ports[port] = true
+				a.ports[port] = false
 				a.mu.Unlock()
+				return port
 			}
-
-			return port
 		}
+		a.mu.Unlock()
 	}
 }
 
@@ -51,5 +53,6 @@ func (a *PortsPool) Free(port int) {
 	if _, ok := a.ports[port]; !ok {
 		return
 	}
-	a.ports[port] = false
+
+	a.ports[port] = true
 }

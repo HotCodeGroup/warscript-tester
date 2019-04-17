@@ -57,7 +57,7 @@ func InitDocker(imgName string, port int, code string) (*docker, error) {
 			startDocker.Process.Kill()
 		}
 	}(startDocker, newDocker)
-	timer := time.NewTimer(time.Second * 2)
+	timer := time.NewTimer(time.Second * 5)
 	ch := make(chan (error), 0)
 	go func(cmd *exec.Cmd, ch chan<- (error)) {
 		err := cmd.Wait()
