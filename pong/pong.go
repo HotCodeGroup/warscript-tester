@@ -18,11 +18,12 @@ type Movable struct {
 
 // Pong - pong game
 type Pong struct {
-	height  float64
-	width   float64
-	ball    Movable
-	player1 Movable
-	player2 Movable
+	ticksLeft int
+	height    float64
+	width     float64
+	ball      Movable
+	player1   Movable
+	player2   Movable
 
 	winner       int
 	isEnded      bool
@@ -38,6 +39,7 @@ const (
 
 // Init - inits game: sets default params
 func (pong *Pong) Init() {
+	pong.ticksLeft = 10000
 	pong.ball = Movable{
 		height: ballRad,
 		width:  ballRad,

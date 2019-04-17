@@ -22,8 +22,20 @@ func (pong *Pong) loadSnapShots(s1 shot, s2 shot) {
 	pong.player1.vY = s1.Me.VY
 	pong.player2.vX = -s2.Me.VX
 	pong.player2.vY = -s2.Me.VY
-
-	pong.tick()
+	pong.ticksLeft--
+	res := pong.tick()
+	if res == p1Win {
+		pong.winner = 1
+		pong.isEnded = true
+	}
+	if res == p1Win {
+		pong.winner = 2
+		pong.isEnded = true
+	}
+	if pong.ticksLeft == 0 {
+		pong.winner = 0
+		pong.isEnded = true
+	}
 }
 
 const (
