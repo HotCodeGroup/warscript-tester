@@ -151,7 +151,7 @@ func (d *docker) IsUp() bool {
 		return false
 	}
 
-	fmt.Println(string(resp), len(resp))
+	//fmt.Println(string(resp), len(resp))
 	// len("CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                              NAMES") == 145
 	return len(resp) >= 145
 }

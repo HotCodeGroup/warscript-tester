@@ -2,6 +2,7 @@ package tester
 
 import (
 	"encoding/json"
+	"log"
 
 	"github.com/HotCodeGroup/warscript-tester/games"
 	"github.com/HotCodeGroup/warscript-tester/pong"
@@ -98,6 +99,7 @@ func ReceiveVerifyRPC(ch *amqp.Channel, d amqp.Delivery) error {
 			return errors.Wrap(err, "can not send internal error")
 		}
 	} else {
+		log.Println()
 		err = sendReplyTo(ch, d.ReplyTo, d.CorrelationId, "result",
 			&TesterStatusResult{
 				Winner: result.GetWinner(),
