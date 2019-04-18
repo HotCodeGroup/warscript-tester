@@ -54,62 +54,62 @@ var collisionTests = []collisionTest{
 		0, 0, 0, 0,
 		20, 30, -10, -10,
 
-		true, right, 17.5, 27.5, false,
+		true, rightSide, 17.5, 27.5, false,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		20, -30, -10, 10,
 
-		true, right, 17.5, -27.5, false,
+		true, rightSide, 17.5, -27.5, false,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		20, 30, -1000, -1000,
 
-		true, right, 17.5, 27.5, false,
+		true, rightSide, 17.5, 27.5, false,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		20, -30, -5000, 5000,
 
-		true, right, 17.5, -27.5, false,
+		true, rightSide, 17.5, -27.5, false,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		-20, 30, 10, -10,
 
-		true, left, -17.5, 27.5, false,
+		true, leftSide, -17.5, 27.5, false,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		-20, -30, 10, 10,
 
-		true, left, -17.5, -27.5, false,
+		true, leftSide, -17.5, -27.5, false,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		-20, 30, 1000, -1000,
 
-		true, left, -17.5, 27.5, false,
+		true, leftSide, -17.5, 27.5, false,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		-20, -30, 5000, 5000,
 
-		true, left, -17.5, -27.5, false,
+		true, leftSide, -17.5, -27.5, false,
 	},
 
 	collisionTest{
 		0, 0, 0, 0,
 		20, 0, -10, 0,
 
-		true, right, 17.5, 0, false,
+		true, rightSide, 17.5, 0, false,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		20, 0, -1000, 0,
 
-		true, right, 17.5, 0, false,
+		true, rightSide, 17.5, 0, false,
 	},
 	collisionTest{
 		0, 0, 0, 0,
@@ -127,7 +127,7 @@ var collisionTests = []collisionTest{
 		0, 0, 0, 0,
 		20, 0, -25, 299,
 
-		true, right, 17.5, 29.9, false,
+		true, rightSide, 17.5, 29.9, false,
 	},
 	collisionTest{
 		0, 0, 0, 0,
@@ -139,20 +139,20 @@ var collisionTests = []collisionTest{
 		0, 0, 0, 0,
 		20, 0, -25, -299,
 
-		true, right, 17.5, -29.9, false,
+		true, rightSide, 17.5, -29.9, false,
 	},
 
 	collisionTest{
 		0, 0, 0, 0,
 		-20, 0, 10, 0,
 
-		true, left, -17.5, 0, false,
+		true, leftSide, -17.5, 0, false,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		-20, 0, 1000, 0,
 
-		true, left, -17.5, 0, false,
+		true, leftSide, -17.5, 0, false,
 	},
 	collisionTest{
 		0, 0, 0, 0,
@@ -170,7 +170,7 @@ var collisionTests = []collisionTest{
 		0, 0, 0, 0,
 		-20, 0, 25, 299,
 
-		true, left, -17.5, 29.9, false,
+		true, leftSide, -17.5, 29.9, false,
 	},
 	collisionTest{
 		0, 0, 0, 0,
@@ -182,7 +182,7 @@ var collisionTests = []collisionTest{
 		0, 0, 0, 0,
 		-20, 0, 25, -299,
 
-		true, left, -17.5, -29.9, false,
+		true, leftSide, -17.5, -29.9, false,
 	},
 
 	//uo-down
@@ -190,62 +190,62 @@ var collisionTests = []collisionTest{
 		0, 0, 0, 0,
 		20, 30, -10, -10,
 
-		true, right, 17.5, 27.5, true,
+		true, rightSide, 17.5, 27.5, true,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		20, -30, -10, 10,
 
-		true, right, 17.5, -27.5, true,
+		true, rightSide, 17.5, -27.5, true,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		20, 30, -1000, -1000,
 
-		true, right, 17.5, 27.5, true,
+		true, rightSide, 17.5, 27.5, true,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		20, -30, -5000, 5000,
 
-		true, right, 17.5, -27.5, true,
+		true, rightSide, 17.5, -27.5, true,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		-20, 30, 10, -10,
 
-		true, left, -17.5, 27.5, true,
+		true, leftSide, -17.5, 27.5, true,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		-20, -30, 10, 10,
 
-		true, left, -17.5, -27.5, true,
+		true, leftSide, -17.5, -27.5, true,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		-20, 30, 1000, -1000,
 
-		true, left, -17.5, 27.5, true,
+		true, leftSide, -17.5, 27.5, true,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		-20, -30, 5000, 5000,
 
-		true, left, -17.5, -27.5, true,
+		true, leftSide, -17.5, -27.5, true,
 	},
 
 	collisionTest{
 		0, 0, 0, 0,
 		20, 0, -10, 0,
 
-		true, right, 17.5, 0, true,
+		true, rightSide, 17.5, 0, true,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		20, 0, -1000, 0,
 
-		true, right, 17.5, 0, true,
+		true, rightSide, 17.5, 0, true,
 	},
 	collisionTest{
 		0, 0, 0, 0,
@@ -263,7 +263,7 @@ var collisionTests = []collisionTest{
 		0, 0, 0, 0,
 		20, 0, -25, 299,
 
-		true, right, 17.5, 29.9, true,
+		true, rightSide, 17.5, 29.9, true,
 	},
 	collisionTest{
 		0, 0, 0, 0,
@@ -275,20 +275,20 @@ var collisionTests = []collisionTest{
 		0, 0, 0, 0,
 		20, 0, -25, -299,
 
-		true, right, 17.5, -29.9, true,
+		true, rightSide, 17.5, -29.9, true,
 	},
 
 	collisionTest{
 		0, 0, 0, 0,
 		-20, 0, 10, 0,
 
-		true, left, -17.5, 0, true,
+		true, leftSide, -17.5, 0, true,
 	},
 	collisionTest{
 		0, 0, 0, 0,
 		-20, 0, 1000, 0,
 
-		true, left, -17.5, 0, true,
+		true, leftSide, -17.5, 0, true,
 	},
 	collisionTest{
 		0, 0, 0, 0,
@@ -306,7 +306,7 @@ var collisionTests = []collisionTest{
 		0, 0, 0, 0,
 		-20, 0, 25, 299,
 
-		true, left, -17.5, 29.9, true,
+		true, leftSide, -17.5, 29.9, true,
 	},
 	collisionTest{
 		0, 0, 0, 0,
@@ -318,19 +318,19 @@ var collisionTests = []collisionTest{
 		0, 0, 0, 0,
 		-20, 0, 25, -299,
 
-		true, left, -17.5, -29.9, true,
+		true, leftSide, -17.5, -29.9, true,
 	},
 }
 
 func side(s int) string {
 	switch s {
-	case up:
+	case upSide:
 		return "up  "
-	case down:
+	case downSide:
 		return "down "
-	case right:
+	case rightSide:
 		return "right"
-	case left:
+	case leftSide:
 		return "left "
 	case none:
 		return "none "
@@ -342,11 +342,11 @@ func side(s int) string {
 func TestCollisionParams(t *testing.T) {
 	for i, ct := range collisionTests {
 		if ct.inverse {
-			if ct.collSide == right {
-				ct.collSide = up
+			if ct.collSide == rightSide {
+				ct.collSide = upSide
 			}
-			if ct.collSide == left {
-				ct.collSide = down
+			if ct.collSide == leftSide {
+				ct.collSide = downSide
 			}
 			t := ct.pVX
 			ct.pVX = ct.pVY
