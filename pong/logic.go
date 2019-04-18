@@ -1,6 +1,9 @@
 package pong
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 const speedLim = float64(10)
 
@@ -46,10 +49,52 @@ const (
 	left
 )
 
+type point struct {
+	x float64
+	y float64
+}
+
+type line struct {
+	beg point
+	end point
+}
+
+func vMult(ax float64, ay float64, bx float64, by float64) float64 {
+	return ax*by - bx*ay
+}
+
+func intersection(l1 line, l2 line) (intersect bool, x float64, y float64) {
+	v1 := vMult(l2.end.x-l2.beg.x, l2.end.y-l2.beg.y, l1.beg.x-l2.beg.x, l1.beg.y-l2.beg.y)
+	v2 := vMult(l2.end.x-l2.beg.x, l2.end.y-l2.beg.y, l1.end.x-l2.beg.x, l1.end.y-l2.beg.y)
+	v3 := vMult(l1.end.x-l1.beg.x, l1.end.y-l1.beg.y, l2.beg.x-l1.beg.x, l2.beg.y-l1.beg.y)
+	v4 := vMult(l1.end.x-l1.beg.x, l1.end.y-l1.beg.y, l2.end.x-l1.beg.x, l2.end.y-l1.beg.y)
+	fmt.Printf("l1: %+v, l2: %+v\n", l1, l2)
+	fmt.Printf("v1: %v, v2: %v, v3: %v, v4: %v\n\n", v1, v2, v3, v4)
+	intersect = ((v1*v2) < 0 && (v3*v4) < 0)
+	if intersect {
+		A1 := l1.end.y - l1.beg.y
+		B1 := l1.beg.x - l1.end.x
+		C1 := -l1.beg.x*(l1.end.y-l1.beg.y) + l1.beg.y*(l1.end.x-l1.beg.x)
+
+		A2 := l2.end.y - l2.beg.y
+		B2 := l2.beg.x - l2.end.x
+		C2 := -l2.beg.x*(l2.end.y-l2.beg.y) + l2.beg.y*(l2.end.x-l2.beg.x)
+
+		d := (A1*B2 - B1*A2)
+		dx := (-C1*B2 + B1*C2)
+		dy := (-A1*C2 + C1*A2)
+		x = (dx / d)
+		y = (dy / d)
+		return
+	}
+	return
+}
+
 func collisionParams(player *Movable, ball *Movable) (isColliding bool, collisionSide int, collisionPointX, collisionPointY float64) {
 	// translate to player's fixed system
 	ball.vX -= player.vX
 	ball.vY -= player.vY
+	fmt.Printf("ball: %+v\nplayer: %+v\n\n", *ball, *player)
 	collisionSide = none
 	defer func() {
 		ball.vX += player.vX
@@ -82,62 +127,82 @@ func collisionParams(player *Movable, ball *Movable) (isColliding bool, collisio
 	bUp := ball.y + ball.height/2
 	bDown := ball.y - ball.height/2
 
+	pLeftLine := line{point{pLeft, pUp}, point{pLeft, pDown}}
+	pRightLine := line{point{pRight, pUp}, point{pRight, pDown}}
+	pUpLine := line{point{pLeft, pUp}, point{pRight, pUp}}
+	pDownLine := line{point{pLeft, pDown}, point{pRight, pDown}}
+
+	bRightDownLine := line{point{bRight, bDown}, point{bRight + ball.vX, bDown + ball.vY}}
+	bLeftDownLine := line{point{bLeft, bDown}, point{bLeft + ball.vX, bDown + ball.vY}}
+	bRightUpLine := line{point{bRight, bUp}, point{bRight + ball.vX, bUp + ball.vY}}
+	bLeftUpLine := line{point{bLeft, bUp}, point{bLeft + ball.vX, bUp + ball.vY}}
+
 	// collision detection
-	rTransition := (bLeft-pRight)*(bLeft+ball.vX-pRight) <= 0
-	lTransition := (bRight-pLeft)*(bRight+ball.vX-pLeft) <= 0
-	uTransition := (bDown-pUp)*(bDown+ball.vY-pUp) <= 0
-	dTransition := (bUp-pDown)*(bUp+ball.vY-pDown) <= 0
-	if rTransition && uTransition {
-		isColliding = true
-		if ball.vY*(bLeft+ball.vX-pRight) < ball.vX*(bDown+ball.vY-pUp) {
-			collisionSide = right
-			collisionPointY = pRight + ball.width
-			collisionPointX = ball.y + ball.vY
-		} else {
-			collisionSide = up
-			collisionPointY = pUp + ball.height
-			collisionPointX = ball.x + ball.vX
-		}
-		return
-	}
-	if rTransition && dTransition {
-		isColliding = true
-		if ball.vY*(bLeft+ball.vX-pRight) < ball.vX*(bUp+ball.vY-pDown) {
-			collisionSide = right
-			collisionPointY = pRight + ball.width
-			collisionPointX = ball.y + ball.vY
-		} else {
-			collisionSide = down
-			collisionPointY = pDown - ball.height
-			collisionPointX = ball.x + ball.vX
-		}
-		return
-	}
-	if lTransition && uTransition {
-		isColliding = true
-		if ball.vY*(bRight+ball.vX-pLeft) < ball.vX*(bDown+ball.vY-pUp) {
+	if bRight <= pLeft {
+		if isColliding, collisionPointX, collisionPointY = intersection(pLeftLine, bRightDownLine); isColliding {
+			collisionPointX -= ball.width / 2
+			collisionPointY += ball.height / 2
+
 			collisionSide = left
-			collisionPointY = pLeft - ball.width
-			collisionPointX = ball.y + ball.vY
-		} else {
-			collisionSide = up
-			collisionPointY = pUp + ball.height
-			collisionPointX = ball.x + ball.vX
+			return
 		}
-		return
-	}
-	if lTransition && dTransition {
-		isColliding = true
-		if ball.vY*(bRight+ball.vX-pLeft) < ball.vX*(bUp+ball.vY-pDown) {
+		if isColliding, collisionPointX, collisionPointY = intersection(pLeftLine, bRightUpLine); isColliding {
+			collisionPointX -= ball.width / 2
+			collisionPointY -= ball.height / 2
+
 			collisionSide = left
-			collisionPointY = pLeft - ball.width
-			collisionPointX = ball.y + ball.vY
-		} else {
-			collisionSide = down
-			collisionPointY = pDown - ball.height
-			collisionPointX = ball.x + ball.vX
+			return
 		}
-		return
+	}
+	if pRight <= bLeft {
+		if isColliding, collisionPointX, collisionPointY = intersection(pRightLine, bLeftDownLine); isColliding {
+			collisionPointX += ball.width / 2
+			collisionPointY += ball.height / 2
+
+			collisionSide = right
+			return
+		}
+		if isColliding, collisionPointX, collisionPointY = intersection(pRightLine, bLeftUpLine); isColliding {
+			collisionPointX += ball.width / 2
+			collisionPointY -= ball.height / 2
+
+			collisionSide = right
+			return
+		}
+	}
+
+	if pUp <= bDown {
+		if isColliding, collisionPointX, collisionPointY = intersection(pUpLine, bLeftDownLine); isColliding {
+			collisionPointX += ball.width / 2
+			collisionPointY += ball.height / 2
+
+			collisionSide = up
+			return
+		}
+		if isColliding, collisionPointX, collisionPointY = intersection(pUpLine, bRightDownLine); isColliding {
+			collisionPointX -= ball.width / 2
+			collisionPointY += ball.height / 2
+
+			collisionSide = up
+			return
+		}
+	}
+
+	if bUp <= pDown {
+		if isColliding, collisionPointX, collisionPointY = intersection(pDownLine, bLeftUpLine); isColliding {
+			collisionPointX += ball.width / 2
+			collisionPointY -= ball.height / 2
+
+			collisionSide = down
+			return
+		}
+		if isColliding, collisionPointX, collisionPointY = intersection(pDownLine, bRightUpLine); isColliding {
+			collisionPointX -= ball.width / 2
+			collisionPointY -= ball.height / 2
+
+			collisionSide = down
+			return
+		}
 	}
 
 	return
