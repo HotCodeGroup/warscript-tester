@@ -2,7 +2,6 @@ package tester
 
 import (
 	"encoding/json"
-	"log"
 
 	"github.com/HotCodeGroup/warscript-tester/games"
 	"github.com/HotCodeGroup/warscript-tester/pong"
@@ -74,8 +73,8 @@ func sendReplyTo(ch *amqp.Channel, to, correlationId, t string, message interfac
 	)
 }
 
-func ReceiveVerifyRPC(ch *amqp.Channel, d amqp.Delivery) error {
-	err := sendReplyTo(ch, d.ReplyTo, d.CorrelationId, "status", receivedMessage)
+func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
+	err := sendReplyTo(t.ch, d.ReplyTo, d.CorrelationId, "status", receivedMessage)
 	if err != nil {
 		return errors.Wrap(err, "can not send receive confirmation")
 	}
@@ -92,15 +91,24 @@ func ReceiveVerifyRPC(ch *amqp.Channel, d amqp.Delivery) error {
 		game = &pong.Pong{}
 	}
 
-	states, result, err := Test(task.Code1, task.Code2, game)
+	states, result, err := t.Test(task.Code1, task.Code2, game)
 	if err != nil {
-		err := sendReplyTo(ch, d.ReplyTo, d.CorrelationId, "error", &TesterStatusError{err.Error()})
+		firstErr := err
+
+		err := sendReplyTo(t.ch, d.ReplyTo, d.CorrelationId, "error", &TesterStatusError{err.Error()})
 		if err != nil {
 			return errors.Wrap(err, "can not send internal error")
 		}
+
+		// TODO: возвращать в очередь только те, на которых не успел докер
+		err = d.Reject(true)
+		if err != nil {
+			return errors.Wrap(err, "can not reject delivery")
+		}
+
+		return errors.Wrap(firstErr, "tester error")
 	} else {
-		log.Println()
-		err = sendReplyTo(ch, d.ReplyTo, d.CorrelationId, "result",
+		err = sendReplyTo(t.ch, d.ReplyTo, d.CorrelationId, "result",
 			&TesterStatusResult{
 				Winner: result.GetWinner(),
 				States: states,
@@ -108,12 +116,11 @@ func ReceiveVerifyRPC(ch *amqp.Channel, d amqp.Delivery) error {
 		if err != nil {
 			return errors.Wrap(err, "can not send result state")
 		}
-	}
 
-	err = d.Ack(false)
-	if err != nil {
-		return errors.Wrap(err, "can not ack delivery")
+		err = d.Ack(false)
+		if err != nil {
+			return errors.Wrap(err, "can not ack delivery")
+		}
+		return nil
 	}
-
-	return nil
 }

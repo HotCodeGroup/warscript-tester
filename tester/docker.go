@@ -2,156 +2,122 @@ package tester
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os/exec"
 	"strconv"
 	"time"
 
-	uuid "github.com/google/uuid"
+	docker "github.com/fsouza/go-dockerclient"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 )
 
 const (
-	sendCodeExt  = "/loadcode"
-	sendStateExt = "/run"
+	sendCodeEndpoint  = "loadcode"
+	sendStateEndpoint = "run"
 )
 
-type docker struct {
-	port            int
-	uuid            uuid.UUID
-	adress          string
-	sendCodeAdress  string
-	sendStateAdress string
+type PlayerContainer struct {
+	PlayerID     int
+	Port         docker.Port
+	container    *docker.Container
+	dockerClient *docker.Client
 }
 
-func InitDocker(imgName string, port int, code string) (*docker, error) {
-	baseAdress := "http://127.0.0.1:" + strconv.Itoa(port)
-	newDocker := &docker{
-		port:            port,
-		adress:          baseAdress,
-		sendCodeAdress:  baseAdress + sendCodeExt,
-		sendStateAdress: baseAdress + sendStateExt,
-	}
-
-	var err error
-	newDocker.uuid, err = uuid.NewRandom()
+func NewPlayerContainer(playerID, port int, imageName string,
+	timeout time.Duration, dockerClient *docker.Client) (*PlayerContainer, error) {
+	pContainerUUID := uuid.New()
+	pContainer, err := dockerClient.CreateContainer(docker.CreateContainerOptions{
+		Name: fmt.Sprintf("p%d_%s_%s", playerID, imageName, pContainerUUID.String()),
+		Config: &docker.Config{
+			Image: imageName,
+			ExposedPorts: map[docker.Port]struct{}{
+				docker.Port("5000/tcp"): {},
+			},
+		},
+		HostConfig: &docker.HostConfig{
+			PortBindings: map[docker.Port][]docker.PortBinding{
+				docker.Port("5000/tcp"): {
+					docker.PortBinding{
+						HostIP:   "127.0.0.1",
+						HostPort: strconv.Itoa(port),
+					},
+				},
+			},
+		},
+	})
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to create uuid")
+		return nil, errors.Wrapf(err, "can not create p%d container", playerID)
 	}
 
-	fmt.Println("initing")
-	startDocker := exec.Command("docker", "run", "-p", strconv.Itoa(port)+":5000", "--name", newDocker.uuid.String(), "-t", imgName)
-	err = startDocker.Start()
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	err = dockerClient.StartContainerWithContext(pContainer.ID, nil, ctx)
 	if err != nil {
-		return nil, errors.New(`failed to run "docker run"`)
-	}
-
-	ok := false
-	defer func(cmd *exec.Cmd, d *docker) {
-		//cmd.Process.Kill()
-		if !ok {
-			fmt.Println("defer closing")
-			newDocker.Kill()
-			startDocker.Process.Kill()
-		}
-	}(startDocker, newDocker)
-	timer := time.NewTimer(time.Second * 5)
-	ch := make(chan (error), 0)
-	go func(cmd *exec.Cmd, ch chan<- (error)) {
-		err := cmd.Wait()
-		ch <- err
-	}(startDocker, ch)
-
-	select {
-	case <-timer.C:
-		// checking if docker container alive
-		if !newDocker.IsUp() {
-			if err := startDocker.Process.Kill(); err != nil {
-				return nil, errors.Wrap(err, "time for docker launch is up: can not kill process")
+		if ctx.Err() != nil { // упали по таймауту
+			if err := dockerClient.RemoveContainer(docker.RemoveContainerOptions{
+				ID:    pContainer.ID,
+				Force: true,
+			}); err != nil {
+				return nil, errors.Wrapf(err, "creation timeout: can not remove p%d container", playerID)
 			}
-			if err := newDocker.Kill(); err != nil {
-				return nil, errors.Wrap(err, "time for docker launch is up: can not stop newDocker")
-			}
-
-			return nil, errors.New("time for docker launch is up")
-		}
-	case err, _ := <-ch:
-		// docker cmd down. Usually error in start
-		if err != nil {
-			return nil, errors.Wrap(err, "failed to start docker")
 		}
 
-		if err := startDocker.Process.Kill(); err != nil {
-			return nil, errors.Wrap(err, "docker suddenly stopped: can not kill process")
-		}
-		if err := newDocker.Kill(); err != nil {
-			return nil, errors.Wrap(err, "docker suddenly stopped: can not stop newDocker")
-		}
-
-		return nil, errors.New("docker suddenly stopped")
+		return nil, errors.Wrapf(err, "can not start p%d container", playerID)
 	}
-	fmt.Println("initited")
 
-	resp, err := newDocker.SendCode(code)
-	fmt.Println("docker response:", string(resp))
+	pContainer, err = dockerClient.InspectContainer(pContainer.ID)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to send code")
+		return nil, errors.Wrapf(err, "can not inspect p%d container", playerID)
 	}
 
-	ok = true
-	return newDocker, nil
+	return &PlayerContainer{
+		PlayerID:     playerID,
+		Port:         docker.Port("5000/tcp"),
+		container:    pContainer,
+		dockerClient: dockerClient,
+	}, nil
 }
 
-func (d *docker) SendCode(code string) ([]byte, error) {
-	return d.SendRequest([]byte(`{"code":"`+code+`"}`), d.sendCodeAdress)
+func (p *PlayerContainer) SendCode(code string) ([]byte, error) {
+	return p.SendRequest([]byte(`{"code":"`+code+`"}`), sendCodeEndpoint)
 }
 
-func (d *docker) SendState(state []byte) ([]byte, error) {
-	return d.SendRequest(state, d.sendStateAdress)
+func (p *PlayerContainer) SendState(state []byte) ([]byte, error) {
+	return p.SendRequest(state, sendStateEndpoint)
 }
 
-func (d *docker) SendRequest(request []byte, url string) ([]byte, error) {
-	if !d.IsUp() {
-		return nil, errors.New("docker is down")
-	}
-
-	resp, err := http.Post(url, "application/json", bytes.NewReader(request))
+func (p *PlayerContainer) SendRequest(body []byte, endpoint string) ([]byte, error) {
+	portBinding := p.container.HostConfig.PortBindings[p.Port][0]
+	resp, err := http.Post(fmt.Sprintf("http://%s:%s/%s", portBinding.HostIP, portBinding.HostPort, endpoint), "application/json", bytes.NewReader(body))
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to send request")
+		return nil, errors.Wrapf(err, "failed to send request to p%d docker", p.PlayerID)
 	}
 
 	res, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to read response body")
+		return nil, errors.Wrapf(err, "failed to read p%d docker response body", p.PlayerID)
 	}
 
 	return res, nil
 }
 
-func (d *docker) Kill() error {
-	return exec.Command("docker", "kill", d.uuid.String()).Run()
-}
+func (p *PlayerContainer) Remove() error {
+	err := p.dockerClient.StopContainer(p.container.ID, 1)
+	if err != nil {
+		return errors.Wrapf(err, "can not stop p%d container", p.PlayerID)
+	}
 
-func KillDockers(ds ...*docker) error {
-	for i, d := range ds {
-		if err := d.Kill(); err != nil {
-			return errors.Wrapf(err, "[%d] ", i)
-		}
+	err = p.dockerClient.RemoveContainer(docker.RemoveContainerOptions{
+		ID:    p.container.ID,
+		Force: true,
+	})
+	if err != nil {
+		return errors.Wrapf(err, "can not remove p%d container", p.PlayerID)
 	}
 
 	return nil
-}
-
-func (d *docker) IsUp() bool {
-	resp, err := exec.Command("docker", "ps", "-f", "name="+d.uuid.String()).Output()
-	if err != nil {
-		fmt.Println("isUp err:", err)
-		return false
-	}
-
-	//fmt.Println(string(resp), len(resp))
-	// len("CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                              NAMES") == 145
-	return len(resp) >= 145
 }
