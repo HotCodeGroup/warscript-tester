@@ -1,6 +1,9 @@
 package pong
 
-import "math"
+import (
+	"fmt"
+	"math"
+)
 
 const speedLim = float64(10)
 
@@ -40,35 +43,87 @@ func (pong *Pong) loadSnapShots(s1 shot, s2 shot) {
 
 const (
 	none = iota
-	up
-	down
-	right
-	left
+	upSide
+	downSide
+	rightSide
+	leftSide
 )
+
+type point struct {
+	x float64
+	y float64
+}
+
+type line struct {
+	beg point
+	end point
+}
+
+func vMult(ax float64, ay float64, bx float64, by float64) float64 {
+	return ax*by - bx*ay
+}
+
+func intersection(l1 line, l2 line) (intersect bool, x float64, y float64) {
+	v1 := vMult(l2.end.x-l2.beg.x, l2.end.y-l2.beg.y, l1.beg.x-l2.beg.x, l1.beg.y-l2.beg.y)
+	v2 := vMult(l2.end.x-l2.beg.x, l2.end.y-l2.beg.y, l1.end.x-l2.beg.x, l1.end.y-l2.beg.y)
+	v3 := vMult(l1.end.x-l1.beg.x, l1.end.y-l1.beg.y, l2.beg.x-l1.beg.x, l2.beg.y-l1.beg.y)
+	v4 := vMult(l1.end.x-l1.beg.x, l1.end.y-l1.beg.y, l2.end.x-l1.beg.x, l2.end.y-l1.beg.y)
+	fmt.Printf("l1: %+v, l2: %+v\n", l1, l2)
+	fmt.Printf("v1: %v, v2: %v, v3: %v, v4: %v\n\n", v1, v2, v3, v4)
+	intersect = ((v1*v2) < 0 && (v3*v4) < 0)
+	if intersect {
+		A1 := l1.end.y - l1.beg.y
+		B1 := l1.beg.x - l1.end.x
+		C1 := -l1.beg.x*(l1.end.y-l1.beg.y) + l1.beg.y*(l1.end.x-l1.beg.x)
+
+		A2 := l2.end.y - l2.beg.y
+		B2 := l2.beg.x - l2.end.x
+		C2 := -l2.beg.x*(l2.end.y-l2.beg.y) + l2.beg.y*(l2.end.x-l2.beg.x)
+
+		d := (A1*B2 - B1*A2)
+		dx := (-C1*B2 + B1*C2)
+		dy := (-A1*C2 + C1*A2)
+		x = (dx / d)
+		y = (dy / d)
+		return
+	}
+	return
+}
+
+const epsilonMove = float64(0.01)
 
 func collisionParams(player *Movable, ball *Movable) (isColliding bool, collisionSide int, collisionPointX, collisionPointY float64) {
 	// translate to player's fixed system
 	ball.vX -= player.vX
 	ball.vY -= player.vY
+	fmt.Printf("ball: %+v\nplayer: %+v\n\n", *ball, *player)
 	collisionSide = none
 	defer func() {
 		ball.vX += player.vX
 		ball.vY += player.vY
-		if collisionSide == right && ball.vX < 0 {
-			ball.vX = -ball.vX
-			return
-		}
-		if collisionSide == left && ball.vX > 0 {
-			ball.vX = -ball.vX
-			return
-		}
-		if collisionSide == up && ball.vY < 0 {
-			ball.vY = -ball.vY
-			return
-		}
-		if collisionSide == down && ball.vY > 0 {
-			ball.vY = -ball.vY
-			return
+		if isColliding {
+			ball.x = collisionPointX
+			ball.y = collisionPointY
+			if collisionSide == rightSide && ball.vX < 0 {
+				ball.vX = -ball.vX
+				ball.x += epsilonMove
+				return
+			}
+			if collisionSide == leftSide && ball.vX > 0 {
+				ball.vX = -ball.vX
+				ball.x -= epsilonMove
+				return
+			}
+			if collisionSide == upSide && ball.vY < 0 {
+				ball.vY = -ball.vY
+				ball.y += epsilonMove
+				return
+			}
+			if collisionSide == downSide && ball.vY > 0 {
+				ball.vY = -ball.vY
+				ball.y -= epsilonMove
+				return
+			}
 		}
 	}()
 
@@ -82,62 +137,82 @@ func collisionParams(player *Movable, ball *Movable) (isColliding bool, collisio
 	bUp := ball.y + ball.height/2
 	bDown := ball.y - ball.height/2
 
+	pLeftLine := line{point{pLeft, pUp}, point{pLeft, pDown}}
+	pRightLine := line{point{pRight, pUp}, point{pRight, pDown}}
+	pUpLine := line{point{pLeft, pUp}, point{pRight, pUp}}
+	pDownLine := line{point{pLeft, pDown}, point{pRight, pDown}}
+
+	bRightDownLine := line{point{bRight, bDown}, point{bRight + ball.vX, bDown + ball.vY}}
+	bLeftDownLine := line{point{bLeft, bDown}, point{bLeft + ball.vX, bDown + ball.vY}}
+	bRightUpLine := line{point{bRight, bUp}, point{bRight + ball.vX, bUp + ball.vY}}
+	bLeftUpLine := line{point{bLeft, bUp}, point{bLeft + ball.vX, bUp + ball.vY}}
+
 	// collision detection
-	rTransition := (bLeft-pRight)*(bLeft+ball.vX-pRight) <= 0
-	lTransition := (bRight-pLeft)*(bRight+ball.vX-pLeft) <= 0
-	uTransition := (bDown-pUp)*(bDown+ball.vY-pUp) <= 0
-	dTransition := (bUp-pDown)*(bUp+ball.vY-pDown) <= 0
-	if rTransition && uTransition {
-		isColliding = true
-		if ball.vY*(bLeft+ball.vX-pRight) < ball.vX*(bDown+ball.vY-pUp) {
-			collisionSide = right
-			collisionPointY = pRight + ball.width
-			collisionPointX = ball.y + ball.vY
-		} else {
-			collisionSide = up
-			collisionPointY = pUp + ball.height
-			collisionPointX = ball.x + ball.vX
+	if bRight <= pLeft {
+		if isColliding, collisionPointX, collisionPointY = intersection(pLeftLine, bRightDownLine); isColliding {
+			collisionPointX -= ball.width / 2
+			collisionPointY += ball.height / 2
+
+			collisionSide = leftSide
+			return
 		}
-		return
+		if isColliding, collisionPointX, collisionPointY = intersection(pLeftLine, bRightUpLine); isColliding {
+			collisionPointX -= ball.width / 2
+			collisionPointY -= ball.height / 2
+
+			collisionSide = leftSide
+			return
+		}
 	}
-	if rTransition && dTransition {
-		isColliding = true
-		if ball.vY*(bLeft+ball.vX-pRight) < ball.vX*(bUp+ball.vY-pDown) {
-			collisionSide = right
-			collisionPointY = pRight + ball.width
-			collisionPointX = ball.y + ball.vY
-		} else {
-			collisionSide = down
-			collisionPointY = pDown - ball.height
-			collisionPointX = ball.x + ball.vX
+	if pRight <= bLeft {
+		if isColliding, collisionPointX, collisionPointY = intersection(pRightLine, bLeftDownLine); isColliding {
+			collisionPointX += ball.width / 2
+			collisionPointY += ball.height / 2
+
+			collisionSide = rightSide
+			return
 		}
-		return
+		if isColliding, collisionPointX, collisionPointY = intersection(pRightLine, bLeftUpLine); isColliding {
+			collisionPointX += ball.width / 2
+			collisionPointY -= ball.height / 2
+
+			collisionSide = rightSide
+			return
+		}
 	}
-	if lTransition && uTransition {
-		isColliding = true
-		if ball.vY*(bRight+ball.vX-pLeft) < ball.vX*(bDown+ball.vY-pUp) {
-			collisionSide = left
-			collisionPointY = pLeft - ball.width
-			collisionPointX = ball.y + ball.vY
-		} else {
-			collisionSide = up
-			collisionPointY = pUp + ball.height
-			collisionPointX = ball.x + ball.vX
+
+	if pUp <= bDown {
+		if isColliding, collisionPointX, collisionPointY = intersection(pUpLine, bLeftDownLine); isColliding {
+			collisionPointX += ball.width / 2
+			collisionPointY += ball.height / 2
+
+			collisionSide = upSide
+			return
 		}
-		return
+		if isColliding, collisionPointX, collisionPointY = intersection(pUpLine, bRightDownLine); isColliding {
+			collisionPointX -= ball.width / 2
+			collisionPointY += ball.height / 2
+
+			collisionSide = upSide
+			return
+		}
 	}
-	if lTransition && dTransition {
-		isColliding = true
-		if ball.vY*(bRight+ball.vX-pLeft) < ball.vX*(bUp+ball.vY-pDown) {
-			collisionSide = left
-			collisionPointY = pLeft - ball.width
-			collisionPointX = ball.y + ball.vY
-		} else {
-			collisionSide = down
-			collisionPointY = pDown - ball.height
-			collisionPointX = ball.x + ball.vX
+
+	if bUp <= pDown {
+		if isColliding, collisionPointX, collisionPointY = intersection(pDownLine, bLeftUpLine); isColliding {
+			collisionPointX += ball.width / 2
+			collisionPointY -= ball.height / 2
+
+			collisionSide = downSide
+			return
 		}
-		return
+		if isColliding, collisionPointX, collisionPointY = intersection(pDownLine, bRightUpLine); isColliding {
+			collisionPointX -= ball.width / 2
+			collisionPointY -= ball.height / 2
+
+			collisionSide = downSide
+			return
+		}
 	}
 
 	return
@@ -165,24 +240,58 @@ func movePlayer(player *Movable, up, down, left, right float64) {
 }
 
 func movePlayerWithBall(player *Movable, ball *Movable, up, down, left, right float64, collSide int, collPX, collPY float64) {
-	// player.x += player.vX
-	// player.y += player.vY
+	player.x += player.vX
+	player.y += player.vY
+	ball.x += player.vX
+	ball.y += player.vY
 
-	// // controls player not to cross bounds
-	// // on x && width
-	// if player.x-player.width/2 < left {
-	// 	player.x = left + player.width/2
-	// }
-	// if player.x+player.width/2 > right {
-	// 	player.x = right - player.width/2
-	// }
-	// // on y && height
-	// if player.y-player.height/2 < down {
-	// 	player.y = down + player.height/2
-	// }
-	// if player.y+player.height/2 > up {
-	// 	player.y = up - player.height/2
-	// }
+	// controls player not to cross bounds
+	// on x && width
+	if player.x-player.width/2 < left {
+		player.x = left + player.width/2
+	}
+	if player.x+player.width/2 > right {
+		player.x = right - player.width/2
+	}
+	// on y && height
+	if player.y-player.height/2 < down {
+		player.y = down + player.height/2
+	}
+	if player.y+player.height/2 > up {
+		player.y = up - player.height/2
+	}
+
+	if up < ball.y+ball.height/2 && collSide == upSide {
+		ball.y = up - ball.height/2 - epsilonMove
+		player.y -= ball.y - player.height/2
+
+		fullBallV := math.Sqrt(ball.x*ball.x + ball.y + ball.y)
+		ball.vY = 0
+		if ball.vX < 0 {
+			ball.vX = -fullBallV
+		} else {
+			ball.vX = fullBallV
+		}
+	}
+	if down > ball.y-ball.height/2 && collSide == downSide {
+		ball.y = down + ball.height/2 + epsilonMove
+		player.y -= ball.y + player.height/2
+
+		fullBallV := math.Sqrt(ball.x*ball.x + ball.y + ball.y)
+		ball.vY = 0
+		if ball.vX < 0 {
+			ball.vX = -fullBallV
+		} else {
+			ball.vX = fullBallV
+		}
+	}
+
+	if math.Abs(player.vX) < math.Abs(ball.vX) {
+		ball.x += ball.vX - player.vX
+	}
+	if math.Abs(player.vY) < math.Abs(ball.vY) {
+		ball.y += ball.vY - player.vY
+	}
 }
 
 const (
@@ -191,9 +300,12 @@ const (
 	p2Win
 )
 
-func moveBall(player1 *Movable, player2 *Movable, ball *Movable, height, width float64) int {
+func moveBall(ball *Movable) {
 	ball.x += ball.vX
 	ball.y += ball.vY
+}
+
+func fixBallPos(ball *Movable, height float64) {
 	if ball.y-ball.height < 0 {
 		ball.y = ball.height
 		ball.vY = -ball.vY
@@ -202,6 +314,9 @@ func moveBall(player1 *Movable, player2 *Movable, ball *Movable, height, width f
 		ball.y = height - ball.height
 		ball.vY = -ball.vY
 	}
+}
+
+func winnerCheck(ball *Movable, width float64) int {
 	if ball.x-ball.width < 0 {
 		return p2Win
 	}
@@ -218,15 +333,15 @@ func (pong *Pong) tick() int {
 	if collide1 {
 		movePlayerWithBall(&pong.player1, &pong.ball, pong.height, 0, 0, pong.width/3, collSide1, collPX1, collPY1)
 		movePlayer(&pong.player2, pong.height, 0, pong.width*2/3, pong.width)
-		return moveBall(&pong.player1, &pong.player2, &pong.ball, pong.height, pong.width)
 	} else if collide2 {
 		movePlayer(&pong.player1, pong.height, 0, 0, pong.width/3)
 		movePlayerWithBall(&pong.player2, &pong.ball, pong.height, 0, pong.width*2/3, pong.width, collSide2, collPX2, collPY2)
-		return moveBall(&pong.player1, &pong.player2, &pong.ball, pong.height, pong.width)
 	} else {
 		movePlayer(&pong.player1, pong.height, 0, 0, pong.width/3)
 		movePlayer(&pong.player2, pong.height, 0, pong.width*2/3, pong.width)
-		return moveBall(&pong.player1, &pong.player2, &pong.ball, pong.height, pong.width)
+		moveBall(&pong.ball)
 	}
 
+	fixBallPos(&pong.ball, pong.height)
+	return winnerCheck(&pong.ball, pong.width)
 }
