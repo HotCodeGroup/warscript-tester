@@ -9,7 +9,7 @@ type PortsPool struct {
 	ports map[int]bool
 }
 
-func NewPortsPool() *PortsPool {
+func newPortsPool() *PortsPool {
 	return &PortsPool{
 		mu: &sync.Mutex{},
 		ports: map[int]bool{

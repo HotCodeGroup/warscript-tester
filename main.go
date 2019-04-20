@@ -6,8 +6,8 @@ import (
 	"strconv"
 
 	"github.com/HotCodeGroup/warscript-tester/tester"
+	docker "github.com/fsouza/go-dockerclient"
 	"github.com/jcftang/logentriesrus"
-
 	"github.com/pkg/errors"
 	"github.com/streadway/amqp"
 
@@ -38,7 +38,10 @@ func failOnError(err error) {
 }
 
 func main() {
-	var err error
+	endpoint := "unix:///var/run/docker.sock"
+	client, err := docker.NewClient(endpoint)
+	failOnError(errors.Wrap(err, "can not create docker client"))
+
 	routineCount, err := strconv.ParseInt(os.Getenv("ROUTINE_COUNT"), 10, 16)
 	failOnError(errors.Wrap(err, "ROUTINE_COUNT int parse error"))
 
@@ -82,14 +85,18 @@ func main() {
 	)
 	failOnError(errors.Wrap(err, "failed to register a consumer"))
 
+	t := tester.NewTester(client, ch)
 	forever := make(chan bool)
 	go func() {
 		for d := range msgs {
 			go func(ch *amqp.Channel, d amqp.Delivery) {
-				err := tester.ReceiveVerifyRPC(ch, d)
+				log.Printf("[NEW] Delivery %s", d.CorrelationId)
+				err := t.ReceiveVerifyRPC(d)
 				if err != nil {
-					log.Errorf("[%s] %s", d.CorrelationId, err)
+					log.Errorf("[ERROR] Delivery %s: %s", d.CorrelationId, err)
+					return
 				}
+				log.Printf("[DONE] Delivery %s", d.CorrelationId)
 			}(ch, d)
 		}
 	}()
