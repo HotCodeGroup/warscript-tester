@@ -379,7 +379,7 @@ func TestCollisionParams(t *testing.T) {
 			ball.width = ball.height
 			ball.height = t
 		}
-		isColl, collSide, collX, collY := collisionParams(&player, &ball)
+		isColl, collSide, collX, collY := collidePlayerBall(&player, &ball)
 		if ct.isColl != isColl || ct.collSide != collSide || ct.collX != collX || ct.collY != collY {
 			t.Errorf("test %d\nexpected:\n\tisColl: %v, collSide: %v, collX: %v, collY: %+v\ngot:\n\tisColl: %v, collSide: %v, collX: %v, collY: %+v\n", i, ct.isColl, side(ct.collSide), ct.collX, ct.collY, isColl, side(collSide), collX, collY)
 		}
