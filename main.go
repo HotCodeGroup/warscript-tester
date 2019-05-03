@@ -121,11 +121,11 @@ func main() {
 					logger.Errorf("[ERROR] Delivery %s: %s", d.CorrelationId, err)
 					return
 				}
-				log.Printf("[DONE] Delivery %s", d.CorrelationId)
+				logger.Printf("[DONE] Delivery %s", d.CorrelationId)
 			}(rabbitChannel, d)
 		}
 	}()
 
-	log.Printf("[%s] Awaiting RPC requests", os.Getenv("ID"))
+	logger.Printf("[%s] Awaiting RPC requests", os.Getenv("ID"))
 	<-forever // блокируемся
 }
