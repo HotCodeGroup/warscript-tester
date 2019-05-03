@@ -24,7 +24,7 @@ func NewTester(d *docker.Client, ch *amqp.Channel) *Tester {
 }
 
 // Test - tests bots submitted as RawCode1 and Rawcode2 by game rules
-func (t *Tester) Test(RawCode1, Rawcode2 string, game games.Game) (states []games.State, result games.Result, returnErr error) {
+func (t *Tester) Test(rawCode1, rawcode2 string, game games.Game) (states []games.State, result games.Result, returnErr error) {
 	game.Init()
 	im1, im2 := game.Images()
 

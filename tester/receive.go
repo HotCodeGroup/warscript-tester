@@ -101,7 +101,7 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 		}
 
 		// TODO: возвращать в очередь только те, на которых не успел докер
-		err = d.Reject(true)
+		err = d.Ack(true)
 		if err != nil {
 			return errors.Wrap(err, "can not reject delivery")
 		}
