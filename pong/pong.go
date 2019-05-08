@@ -2,6 +2,7 @@ package pong
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/HotCodeGroup/warscript-tester/games"
 	"github.com/pkg/errors"
@@ -41,6 +42,8 @@ const (
 // Init - inits game: sets default params
 func (pong *Pong) Init() {
 	pong.ticksLeft = 10000
+	pong.width = fieldWidth
+	pong.height = fieldHeight
 	pong.ball = Movable{
 		height: ballRad,
 		width:  ballRad,
@@ -111,6 +114,7 @@ func (pong *Pong) createShot1() shot {
 }
 
 func (pong *Pong) createShot2() shot {
+	fmt.Printf("%f, %f, %+v", pong.width, pong.height, pong.player2)
 	return shot{
 		Me: shotInner{
 			X:  pong.width - pong.player2.x,
@@ -149,11 +153,12 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 		pong.occuredError = games.ErrPlayer1Fail
 		return errors.Wrap(err1, games.ErrPlayer1Fail.Error())
 	}
+
 	err2 := json.Unmarshal(shot2, &s2)
 	if err2 != nil {
 		pong.isEnded = true
 		pong.occuredError = games.ErrPlayer2Fail
-		return errors.Wrap(err2, games.ErrPlayer1Fail.Error())
+		return errors.Wrap(err2, games.ErrPlayer2Fail.Error())
 	}
 
 	pong.loadSnapShots(s1, s2)
