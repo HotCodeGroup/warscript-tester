@@ -1,7 +1,6 @@
 package pong
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -68,8 +67,8 @@ func intersection(l1 line, l2 line) (intersect bool, x float64, y float64) {
 	v2 := vMult(l2.end.x-l2.beg.x, l2.end.y-l2.beg.y, l1.end.x-l2.beg.x, l1.end.y-l2.beg.y)
 	v3 := vMult(l1.end.x-l1.beg.x, l1.end.y-l1.beg.y, l2.beg.x-l1.beg.x, l2.beg.y-l1.beg.y)
 	v4 := vMult(l1.end.x-l1.beg.x, l1.end.y-l1.beg.y, l2.end.x-l1.beg.x, l2.end.y-l1.beg.y)
-	fmt.Printf("l1: %+v, l2: %+v\n", l1, l2)
-	fmt.Printf("v1: %v, v2: %v, v3: %v, v4: %v\n\n", v1, v2, v3, v4)
+	// fmt.Printf("l1: %+v, l2: %+v\n", l1, l2)
+	// fmt.Printf("v1: %v, v2: %v, v3: %v, v4: %v\n\n", v1, v2, v3, v4)
 	intersect = ((v1*v2) < 0 && (v3*v4) < 0)
 	if intersect {
 		A1 := l1.end.y - l1.beg.y
@@ -96,7 +95,7 @@ func collidePlayerBall(player *Movable, ball *Movable) (isColliding bool, collis
 	// translate to player's fixed system
 	ball.vX -= player.vX
 	ball.vY -= player.vY
-	fmt.Printf("ball: %+v\nplayer: %+v\n\n", *ball, *player)
+	// fmt.Printf("ball: %+v\nplayer: %+v\n\n", *ball, *player)
 	collisionSide = none
 	defer func() {
 		ball.vX += player.vX
@@ -307,11 +306,6 @@ const (
 	p1Win
 	p2Win
 )
-
-func moveBall(ball *Movable) {
-	ball.x += ball.vX
-	ball.y += ball.vY
-}
 
 func fixBallPos(ball *Movable, height float64) bool {
 	if ball.y-ball.height < 0 {
