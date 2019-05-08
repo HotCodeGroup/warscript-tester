@@ -322,10 +322,10 @@ func fixBallPos(ball *Movable, height float64) bool {
 }
 
 func winnerCheck(ball *Movable, width float64) int {
-	if ball.x-ball.width < 0 {
+	if (ball.x-ball.width)/2 < 0 {
 		return p2Win
 	}
-	if ball.x+ball.width > width {
+	if (ball.x+ball.width)/2 > width {
 		return p1Win
 	}
 	return noWinner

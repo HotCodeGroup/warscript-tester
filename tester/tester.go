@@ -1,6 +1,7 @@
 package tester
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/HotCodeGroup/warscript-tester/games"
@@ -71,6 +72,7 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (states []game
 	for {
 		//log.Println("step")
 		st1, st2 := game.Snapshots()
+		fmt.Printf("st1: %s\nst2: %s\n", string(st1), string(st2))
 
 		resp1, err1 := p1Container.SendState(st1)
 		if err1 != nil {
@@ -90,9 +92,11 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (states []game
 		}
 
 		state, fin := game.GetState()
+		fmt.Printf("state: %+v\n", state)
 		states = append(states, state)
 		if fin {
 			result = game.GetResult()
+			fmt.Printf("result: %+v\n", result)
 			return
 		}
 	}
