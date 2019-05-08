@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/HotCodeGroup/warscript-tester/games"
+	"github.com/pkg/errors"
 )
 
 // Movable - 2D object with position, speed, height and width
@@ -146,13 +147,13 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 	if err1 != nil {
 		pong.isEnded = true
 		pong.occuredError = games.ErrPlayer1Fail
-		return games.ErrPlayer1Fail
+		return errors.Wrap(err1, games.ErrPlayer1Fail.Error())
 	}
 	err2 := json.Unmarshal(shot2, &s2)
 	if err2 != nil {
 		pong.isEnded = true
 		pong.occuredError = games.ErrPlayer2Fail
-		return games.ErrPlayer2Fail
+		return errors.Wrap(err2, games.ErrPlayer1Fail.Error())
 	}
 
 	pong.loadSnapShots(s1, s2)
