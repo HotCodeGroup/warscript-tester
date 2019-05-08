@@ -1,7 +1,6 @@
 package tester
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/HotCodeGroup/warscript-tester/games"
@@ -34,7 +33,7 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (states []game
 	port2 := t.ports.GetPort()
 	defer t.ports.Free(port2)
 
-	p1Container, err := NewPlayerContainer(1, port1, im1, 7*time.Second, t.dockerClient)
+	p1Container, err := NewPlayerContainer(1, port1, im1, 10*time.Second, t.dockerClient)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -45,7 +44,7 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (states []game
 		}
 	}()
 
-	p2Container, err := NewPlayerContainer(2, port2, im2, 7*time.Second, t.dockerClient)
+	p2Container, err := NewPlayerContainer(2, port2, im2, 10*time.Second, t.dockerClient)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -56,6 +55,7 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (states []game
 		}
 	}()
 
+	time.Sleep(1 * time.Second)
 	if _, err := p1Container.SendCode(rawCode1); err != nil {
 		returnErr = errors.Wrap(err, "can not init p1 container code")
 		return
@@ -72,8 +72,6 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (states []game
 	for {
 		//log.Println("step")
 		st1, st2 := game.Snapshots()
-		fmt.Printf("st1: %s\nst2: %s\n", string(st1), string(st2))
-
 		resp1, err1 := p1Container.SendState(st1)
 		if err1 != nil {
 			returnErr = errors.Wrap(err1, "docker1 error")
@@ -92,11 +90,9 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (states []game
 		}
 
 		state, fin := game.GetState()
-		fmt.Printf("state: %+v\n", state)
 		states = append(states, state)
 		if fin {
 			result = game.GetResult()
-			fmt.Printf("result: %+v\n", result)
 			return
 		}
 	}

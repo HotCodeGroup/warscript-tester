@@ -51,8 +51,7 @@ const server = http.createServer((req, res) => {
             ball.vX = params.ball.vX
             ball.vY = params.ball.vY
 
-            me.setMoveVector = (speed, x, y) => {
-
+            me.setMoveVector = function(speed, x, y) {
                 let nSpeed = speed / Math.sqrt(x * x + y * y);
                 if (isNaN(nSpeed) || nSpeed == Infinity) {
                     nSpeed = 0;
@@ -61,6 +60,7 @@ const server = http.createServer((req, res) => {
                 this.vX = x * nSpeed;
                 this.vY = y * nSpeed;
             }
+
             p(me, enemy, ball)
 
             let resp = JSON.stringify({
