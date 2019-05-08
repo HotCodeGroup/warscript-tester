@@ -20,6 +20,10 @@ const (
 	sendStateEndpoint = "run"
 )
 
+var (
+	ErrTimeount = errors.New("timeout")
+)
+
 type PlayerContainer struct {
 	PlayerID     int
 	Port         docker.Port
@@ -63,7 +67,7 @@ func NewPlayerContainer(playerID, port int, imageName string,
 				ID:    pContainer.ID,
 				Force: true,
 			}); err != nil {
-				return nil, errors.Wrapf(err, "creation timeout: can not remove p%d container", playerID)
+				return nil, errors.Wrapf(ErrTimeount, "creation timeout: can not remove p%d container", playerID)
 			}
 		}
 
