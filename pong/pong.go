@@ -2,7 +2,6 @@ package pong
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/HotCodeGroup/warscript-tester/games"
 	"github.com/pkg/errors"
@@ -114,7 +113,6 @@ func (pong *Pong) createShot1() shot {
 }
 
 func (pong *Pong) createShot2() shot {
-	fmt.Printf("%f, %f, %+v", pong.width, pong.height, pong.player2)
 	return shot{
 		Me: shotInner{
 			X:  pong.width - pong.player2.x,
