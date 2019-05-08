@@ -3,6 +3,7 @@ package tester
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -83,7 +84,16 @@ func NewPlayerContainer(playerID, port int, imageName string,
 }
 
 func (p *PlayerContainer) SendCode(code string) ([]byte, error) {
-	return p.SendRequest([]byte(`{"code":"`+code+`"}`), sendCodeEndpoint)
+	body, err := json.Marshal(struct {
+		Code string `json:"code"`
+	}{
+		Code: code,
+	})
+	if err != nil {
+		return nil, errors.Wrap(err, "can not marshal body")
+	}
+
+	return p.SendRequest(body, sendCodeEndpoint)
 }
 
 func (p *PlayerContainer) SendState(state []byte) ([]byte, error) {
@@ -96,6 +106,7 @@ func (p *PlayerContainer) SendRequest(body []byte, endpoint string) ([]byte, err
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to send request to p%d docker", p.PlayerID)
 	}
+	defer resp.Body.Close()
 
 	res, err := ioutil.ReadAll(resp.Body)
 	if err != nil {

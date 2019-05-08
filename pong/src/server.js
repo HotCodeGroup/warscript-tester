@@ -13,7 +13,7 @@ const {
 
 const server = http.createServer((req, res) => {
     console.log(req.url)
-    if (req.method === 'POST' && req.url == loadcode) {
+    if (req.method === 'POST' && req.url === loadcode) {
         let body = [];
         req.on('data', (chunk) => {
             body.push(chunk);
@@ -25,7 +25,7 @@ const server = http.createServer((req, res) => {
             res.statusCode = 200;
             res.end(params.code)
         });
-    } else if (req.method === 'POST' && req.url == run) {
+    } else if (req.method === 'POST' && req.url === run) {
         let body = [];
         req.on('data', (chunk) => {
             body.push(chunk);
