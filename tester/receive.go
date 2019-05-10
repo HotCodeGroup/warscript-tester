@@ -94,7 +94,7 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 	states, result, err := t.Test(task.Code1, task.Code2, game)
 	if err != nil {
 		firstErr := err
-		if errors.Cause(firstErr) != ErrTimeount {
+		if errors.Cause(firstErr) == ErrTimeount {
 			err = d.Reject(true)
 			if err != nil {
 				return errors.Wrap(err, "can not reject delivery")
@@ -103,12 +103,11 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 			return errors.Wrap(firstErr, "timeout error")
 		}
 
-		err := sendReplyTo(t.ch, d.ReplyTo, d.CorrelationId, "error", &TesterStatusError{err.Error()})
+		err = sendReplyTo(t.ch, d.ReplyTo, d.CorrelationId, "error", &TesterStatusError{firstErr.Error()})
 		if err != nil {
 			return errors.Wrap(err, "can not send internal error")
 		}
 
-		// TODO: возвращать в очередь только те, на которых не успел докер
 		err = d.Ack(true)
 		if err != nil {
 			return errors.Wrap(err, "can not ack delivery")

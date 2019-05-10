@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -62,13 +63,15 @@ func NewPlayerContainer(playerID, port int, imageName string,
 
 	err = dockerClient.StartContainerWithContext(pContainer.ID, nil, ctx)
 	if err != nil {
+		if rmErr := dockerClient.RemoveContainer(docker.RemoveContainerOptions{
+			ID:    pContainer.ID,
+			Force: true,
+		}); rmErr != nil {
+			return nil, errors.Wrapf(rmErr, "can not remove p%d container(intial err %s)", playerID, err)
+		}
+
 		if ctx.Err() != nil { // упали по таймауту
-			if err := dockerClient.RemoveContainer(docker.RemoveContainerOptions{
-				ID:    pContainer.ID,
-				Force: true,
-			}); err != nil {
-				return nil, errors.Wrapf(ErrTimeount, "creation timeout: can not remove p%d container", playerID)
-			}
+			return nil, errors.Wrapf(ErrTimeount, "p%d container creation timeout", playerID)
 		}
 
 		return nil, errors.Wrapf(err, "can not start p%d container", playerID)
@@ -122,8 +125,8 @@ func (p *PlayerContainer) SendRequest(body []byte, endpoint string) ([]byte, err
 
 func (p *PlayerContainer) Remove() error {
 	err := p.dockerClient.StopContainer(p.container.ID, 1)
-	if err != nil {
-		return errors.Wrapf(err, "can not stop p%d container", p.PlayerID)
+	if err != nil { // может быть ситуация при которой контейнер уже стопнут
+		log.Printf("can not stop p%d container: %s", p.PlayerID, err)
 	}
 
 	err = p.dockerClient.RemoveContainer(docker.RemoveContainerOptions{
