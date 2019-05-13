@@ -24,8 +24,9 @@ type TesterStatusError struct {
 }
 
 type TesterStatusResult struct {
-	Winner int           `json:"result"`
+	Info   games.Info    `json:"info"`
 	States []games.State `json:"states"`
+	Winner int           `json:"result"`
 }
 
 type Lang string
@@ -91,7 +92,7 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 		game = &pong.Pong{}
 	}
 
-	states, result, err := t.Test(task.Code1, task.Code2, game)
+	info, states, result, err := t.Test(task.Code1, task.Code2, game)
 	if err != nil {
 		firstErr := err
 		if errors.Cause(firstErr) == ErrTimeount {
@@ -117,8 +118,9 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 	} else {
 		err = sendReplyTo(t.ch, d.ReplyTo, d.CorrelationId, "result",
 			&TesterStatusResult{
-				Winner: result.GetWinner(),
+				Info:   info,
 				States: states,
+				Winner: result.GetWinner(),
 			})
 		if err != nil {
 			return errors.Wrap(err, "can not send result state")

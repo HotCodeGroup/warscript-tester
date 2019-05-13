@@ -5,6 +5,11 @@ type State interface {
 	JSON() []byte
 }
 
+// Info represents information about game objects
+type Info interface {
+	JSON() []byte
+}
+
 // Result - result of the game
 type Result interface {
 	State
@@ -17,6 +22,7 @@ type Game interface {
 	Images() (string, string)
 	Snapshots() (shot1, shot2 []byte)
 	SaveSnapshots(shot1, shot2 []byte) error
+	GetInfo() (info Info)
 	GetState() (state State, fin bool)
 	GetResult() (result Result)
 }

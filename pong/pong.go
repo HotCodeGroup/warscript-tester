@@ -164,19 +164,29 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 	return nil
 }
 
+func (pong *Pong) GetInfo() games.Info {
+	i := &Info{}
+	i.Ball.Diameter = pong.ball.x / pong.width
+	i.Racket.Height = pong.player1.height / pong.height
+	i.Racket.Width = pong.player1.width / pong.width
+	i.Ratio = pong.width / pong.height
+
+	return i
+}
+
 func (pong *Pong) GetState() (state games.State, fin bool) {
 	return &State{
 		Player1: object2D{
-			X: pong.player1.x,
-			Y: pong.player1.y,
+			X: pong.player1.x / pong.width,
+			Y: pong.player1.y / pong.height,
 		},
 		Player2: object2D{
-			X: pong.player2.x,
-			Y: pong.player2.y,
+			X: pong.player2.x / pong.width,
+			Y: pong.player2.y / pong.height,
 		},
 		Ball: object2D{
-			X: pong.ball.x,
-			Y: pong.ball.y,
+			X: pong.ball.x / pong.width,
+			Y: pong.ball.y / pong.height,
 		},
 	}, pong.isEnded
 }
@@ -190,16 +200,16 @@ func (pong *Pong) GetResult() (result games.Result) {
 		Winner: pong.winner,
 		Error:  pong.occuredError,
 		Player1: object2D{
-			X: pong.player1.x,
-			Y: pong.player1.y,
+			X: pong.player1.x / pong.width,
+			Y: pong.player1.y / pong.height,
 		},
 		Player2: object2D{
-			X: pong.player2.x,
-			Y: pong.player2.y,
+			X: pong.player2.x / pong.width,
+			Y: pong.player2.y / pong.height,
 		},
 		Ball: object2D{
-			X: pong.ball.x,
-			Y: pong.ball.y,
+			X: pong.ball.x / pong.width,
+			Y: pong.ball.y / pong.height,
 		},
 	}
 }
