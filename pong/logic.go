@@ -268,7 +268,9 @@ func movePlayerWithBall(player *Movable, ball *Movable, up, down, left, right fl
 		player.y = up - player.height/2
 	}
 
+	bounceSpeedCorr := true
 	if up < ball.y+ball.height/2 && collSide == upSide {
+		bounceSpeedCorr = false
 		ball.y = up - ball.height/2 - epsilonMove
 		player.y = ball.y - ball.height/2 - epsilonMove - player.height/2
 
@@ -281,6 +283,7 @@ func movePlayerWithBall(player *Movable, ball *Movable, up, down, left, right fl
 		}
 	}
 	if down > ball.y-ball.height/2 && collSide == downSide {
+		bounceSpeedCorr = false
 		ball.y = down + ball.height/2 + epsilonMove
 		player.y = ball.y + ball.height/2 + epsilonMove + player.height/2
 
@@ -301,13 +304,15 @@ func movePlayerWithBall(player *Movable, ball *Movable, up, down, left, right fl
 	}
 
 	//setting ball speed
-	xDir := ball.x - player.x
-	yDir := ball.y - player.y
-	dirMod := math.Sqrt(xDir*xDir + yDir*yDir)
-	xDir, yDir = xDir/dirMod, yDir/dirMod
-	vMod := math.Sqrt(ball.vX*ball.vX + ball.vY*ball.vY)
-	ball.vX = xDir * vMod
-	ball.vY = yDir * vMod
+	if bounceSpeedCorr {
+		xDir := ball.x - player.x
+		yDir := ball.y - player.y
+		dirMod := math.Sqrt(xDir*xDir + yDir*yDir)
+		xDir, yDir = xDir/dirMod, yDir/dirMod
+		vMod := math.Sqrt(ball.vX*ball.vX + ball.vY*ball.vY)
+		ball.vX = xDir * vMod
+		ball.vY = yDir * vMod
+	}
 }
 
 const (
