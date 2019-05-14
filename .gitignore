@@ -13,3 +13,4 @@
 .sonarlint
 warscript-tester
 run.sh
+.vscode

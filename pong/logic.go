@@ -299,6 +299,15 @@ func movePlayerWithBall(player *Movable, ball *Movable, up, down, left, right fl
 	if math.Abs(player.vY) < math.Abs(ball.vY) {
 		ball.y += ball.vY - player.vY
 	}
+
+	//setting ball speed
+	xDir := ball.x - player.x
+	yDir := ball.y - player.y
+	dirMod := math.Sqrt(xDir*xDir + yDir*yDir)
+	xDir, yDir = xDir/dirMod, yDir/dirMod
+	vMod := math.Sqrt(ball.vX*ball.vX + ball.vY*ball.vY)
+	ball.vX = xDir * vMod
+	ball.vY = yDir * vMod
 }
 
 const (
@@ -322,10 +331,10 @@ func fixBallPos(ball *Movable, height float64) bool {
 }
 
 func winnerCheck(ball *Movable, width float64) int {
-	if (ball.x-ball.width)/2 < 0 {
+	if ball.x-ball.width/2 < 0 {
 		return p2Win
 	}
-	if (ball.x+ball.width)/2 > width {
+	if ball.x+ball.width/2 > width {
 		return p1Win
 	}
 	return noWinner
