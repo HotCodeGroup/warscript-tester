@@ -13,7 +13,7 @@ const {
 
 const server = http.createServer((req, res) => {
     console.log(req.url)
-    if (req.method === 'POST' && req.url == loadcode) {
+    if (req.method === 'POST' && req.url === loadcode) {
         let body = [];
         req.on('data', (chunk) => {
             body.push(chunk);
@@ -22,10 +22,10 @@ const server = http.createServer((req, res) => {
             let params = JSON.parse(body)
             p = new Function("me", "enemy", "ball", params.code);
             res.setHeader("Content-Type", "application/json");
-            res.status= 200;
+            res.statusCode = 200;
             res.end(params.code)
         });
-    } else if (req.method === 'POST' && req.url == run) {
+    } else if (req.method === 'POST' && req.url === run) {
         let body = [];
         req.on('data', (chunk) => {
             body.push(chunk);
@@ -51,8 +51,7 @@ const server = http.createServer((req, res) => {
             ball.vX = params.ball.vX
             ball.vY = params.ball.vY
 
-            me.setMoveVector = (speed, x, y) => {
-
+            me.setMoveVector = function(speed, x, y) {
                 let nSpeed = speed / Math.sqrt(x * x + y * y);
                 if (isNaN(nSpeed) || nSpeed == Infinity) {
                     nSpeed = 0;
@@ -61,11 +60,15 @@ const server = http.createServer((req, res) => {
                 this.vX = x * nSpeed;
                 this.vY = y * nSpeed;
             }
+
             p(me, enemy, ball)
 
-            let resp = JSON.stringify({"me":me, "enemy":enemy, "ball":ball})
-            res.setHeader("Content-Type", "application/json");
-            res.status(200);
+            let resp = JSON.stringify({
+                "me": me,
+                "enemy": enemy,
+                "ball": ball
+            })
+            res.setHeader('Content-Type', 'application/json');
             res.end(resp)
         });
     }
