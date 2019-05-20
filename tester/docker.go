@@ -22,9 +22,11 @@ const (
 )
 
 var (
+	// ErrTimeount ошибка -- выход по таймауту
 	ErrTimeount = errors.New("timeout")
 )
 
+// PlayerContainer инкапсуляция коннекта с докером
 type PlayerContainer struct {
 	PlayerID     int
 	Port         docker.Port
@@ -32,6 +34,7 @@ type PlayerContainer struct {
 	dockerClient *docker.Client
 }
 
+// NewPlayerContainer создание и запуск нового докер контейнера
 func NewPlayerContainer(playerID, port int, imageName string,
 	timeout time.Duration, dockerClient *docker.Client) (*PlayerContainer, error) {
 	pContainerUUID := uuid.New()
@@ -90,6 +93,7 @@ func NewPlayerContainer(playerID, port int, imageName string,
 	}, nil
 }
 
+// SendCode инициализация докер контейнера кодом решения
 func (p *PlayerContainer) SendCode(code string) ([]byte, error) {
 	body, err := json.Marshal(struct {
 		Code string `json:"code"`
@@ -103,13 +107,16 @@ func (p *PlayerContainer) SendCode(code string) ([]byte, error) {
 	return p.SendRequest(body, sendCodeEndpoint)
 }
 
+// SendState отправка в контейнер текущего состояния игры
 func (p *PlayerContainer) SendState(state []byte) ([]byte, error) {
 	return p.SendRequest(state, sendStateEndpoint)
 }
 
+// SendRequest отправка запроса в контенер
 func (p *PlayerContainer) SendRequest(body []byte, endpoint string) ([]byte, error) {
 	portBinding := p.container.HostConfig.PortBindings[p.Port][0]
-	resp, err := http.Post(fmt.Sprintf("http://%s:%s/%s", portBinding.HostIP, portBinding.HostPort, endpoint), "application/json", bytes.NewReader(body))
+	resp, err := http.Post(fmt.Sprintf("http://%s:%s/%s", portBinding.HostIP,
+		portBinding.HostPort, endpoint), "application/json", bytes.NewReader(body))
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to send request to p%d docker", p.PlayerID)
 	}
@@ -123,6 +130,7 @@ func (p *PlayerContainer) SendRequest(body []byte, endpoint string) ([]byte, err
 	return res, nil
 }
 
+// Remove остановка и удаление контейнера
 func (p *PlayerContainer) Remove() error {
 	err := p.dockerClient.StopContainer(p.container.ID, 1)
 	if err != nil { // может быть ситуация при которой контейнер уже стопнут

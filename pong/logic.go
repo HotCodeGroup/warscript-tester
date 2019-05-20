@@ -6,14 +6,14 @@ import (
 
 const speedLim = float64(10)
 
-func (pong *Pong) loadSnapShots(s1 shot, s2 shot) {
-	//loading speed of player1
+func (pong *Pong) loadSnapShots(s1, s2 *shot) {
+	// loading speed of player1
 	if s1.Me.VX*s1.Me.VX+s1.Me.VY*s1.Me.VY > speedLim*speedLim {
 		coef := math.Sqrt((speedLim * speedLim) / (s1.Me.VX*s1.Me.VX + s1.Me.VY*s1.Me.VY))
 		s1.Me.VX *= coef
 		s1.Me.VY *= coef
 	}
-	//loading speed of player2
+	// loading speed of player2
 	if s2.Me.VX*s2.Me.VX+s2.Me.VY*s2.Me.VY > speedLim*speedLim {
 		coef := math.Sqrt((speedLim * speedLim) / (s2.Me.VX*s2.Me.VX + s2.Me.VY*s2.Me.VY))
 		s2.Me.VX *= coef
@@ -221,7 +221,6 @@ func collidePlayerBall(player *Movable, ball *Movable) (isColliding bool, collis
 			return
 		}
 	}
-
 	return
 }
 
@@ -353,7 +352,8 @@ func (pong *Pong) tick() int {
 				movePlayer(&pong.player2, pong.height, 0, pong.width*2/3, pong.width)
 			} else if collide2 {
 				movePlayer(&pong.player1, pong.height, 0, 0, pong.width/3)
-				movePlayerWithBall(&pong.player2, &pong.ball, pong.height, 0, pong.width*2/3, pong.width, collSide2, collPX2, collPY2)
+				movePlayerWithBall(&pong.player2, &pong.ball, pong.height,
+					0, pong.width*2/3, pong.width, collSide2, collPX2, collPY2)
 			}
 		} else {
 			pong.ball.x += pong.ball.vX
