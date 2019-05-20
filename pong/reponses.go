@@ -20,8 +20,8 @@ type State struct {
 
 // JSON - returns marshaled json
 func (st *State) JSON() []byte {
-	json, _ := json.Marshal(st)
-	return json
+	j, _ := json.Marshal(st)
+	return j
 }
 
 // Info - implements interface games.Info
@@ -40,8 +40,8 @@ type Info struct {
 
 // JSON - returns marshaled json
 func (i *Info) JSON() []byte {
-	json, _ := json.Marshal(i)
-	return json
+	j, _ := json.Marshal(i)
+	return j
 }
 
 // Result - implements interface games.Result
@@ -61,6 +61,6 @@ func (res *Result) GetWinner() int {
 
 // JSON - returns marshaled json
 func (res *Result) JSON() []byte {
-	json, _ := json.Marshal(res)
-	return json
+	j, _ := json.Marshal(res)
+	return j
 }
