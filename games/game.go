@@ -27,6 +27,7 @@ type Game interface {
 	GetResult() (result Result)
 }
 
+// GameError ошибка, возникшая при проверки игры
 type GameError struct {
 	msg string
 }
@@ -36,12 +37,15 @@ func (e *GameError) Error() string {
 }
 
 var (
+	// ErrPlayer1Fail ошибка в ответе игрока 1
 	ErrPlayer1Fail = &GameError{
 		msg: "player1 response was incorrect",
 	}
+	// ErrPlayer2Fail ошибка в ответе игрока 2
 	ErrPlayer2Fail = &GameError{
 		msg: "player2 response was incorrect",
 	}
+	// ErrInternal внутренняя ошибка сети
 	ErrInternal = &GameError{
 		msg: "internal failure",
 	}
