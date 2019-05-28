@@ -3,6 +3,8 @@ package tester
 import (
 	"encoding/json"
 
+	"github.com/HotCodeGroup/warscript-tester/atod"
+
 	"github.com/HotCodeGroup/warscript-tester/games"
 	"github.com/HotCodeGroup/warscript-tester/pong"
 
@@ -46,6 +48,7 @@ type TestTask struct {
 
 const (
 	pongSlug = "pong"
+	atodSlug = "atod"
 )
 
 var (
@@ -97,6 +100,8 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 	var game games.Game
 	if task.GameSlug == pongSlug {
 		game = &pong.Pong{}
+	} else if task.GameSlug == atodSlug {
+		game = &atod.Atod{}
 	}
 
 	info, states, result, err := t.Test(task.Code1, task.Code2, game)
