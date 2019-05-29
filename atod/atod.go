@@ -10,6 +10,7 @@ type obstacle struct {
 }
 
 type unit struct {
+	carriedFlag  *flag
 	x            float64
 	y            float64
 	radius       float64
@@ -34,6 +35,12 @@ type projectile interface {
 	unitIntersect(*unit) bool
 	obstacleIntersect(*obstacle) bool
 	move() bool
+
+	getType() string
+	getX() float64
+	getY() float64
+	getVX() float64
+	getVY() float64
 }
 
 type dropzone struct {
@@ -56,7 +63,7 @@ type Atod struct {
 	dropzone1 dropzone
 	dropzone2 dropzone
 
-	projectiles []*projectile
+	projectiles []projectile
 
 	player1Units []*unit
 	player2Units []*unit

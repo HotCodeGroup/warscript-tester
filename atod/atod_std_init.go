@@ -37,7 +37,7 @@ func stdField() *Atod {
 			radius: stdDropZoneRad,
 		},
 
-		projectiles: make([]*projectile, 0, 0),
+		projectiles: make([]projectile, 0, 0),
 
 		player1Units: stdUnits(false),
 		player2Units: stdUnits(true),
@@ -171,6 +171,26 @@ func (b *stdBullet) move() bool {
 	b.y += b.vY
 
 	return true
+}
+
+func (b *stdBullet) getType() string {
+	return "bullet"
+}
+
+func (b *stdBullet) getX() float64 {
+	return b.x
+}
+
+func (b *stdBullet) getY() float64 {
+	return b.y
+}
+
+func (b *stdBullet) getVX() float64 {
+	return b.vX
+}
+
+func (b *stdBullet) getVY() float64 {
+	return b.vY
 }
 
 func bulletProducer(u *unit) func(float64, float64) projectile {

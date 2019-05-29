@@ -83,11 +83,3 @@ func (a *Atod) GetResult() (result games.Result) {
 		Error:  a.occuredError,
 	}
 }
-
-func (a *Atod) createShot1() shot {
-	return shot{}
-}
-
-func (a *Atod) createShot2() shot {
-	return shot{}
-}

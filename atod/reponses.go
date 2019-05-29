@@ -6,9 +6,6 @@ import (
 	"github.com/HotCodeGroup/warscript-tester/games"
 )
 
-type shot struct {
-}
-
 type obstacleResp struct {
 	X      float64 `json:"x"`
 	Y      float64 `json:"y"`
