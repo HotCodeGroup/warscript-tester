@@ -24,6 +24,7 @@ const (
 
 func stdField() *Atod {
 	return &Atod{
+		ticksLeft: 10000,
 		heihgt:    stdHeight,
 		width:     stdWidth,
 		obstacles: stdObstacles(),
