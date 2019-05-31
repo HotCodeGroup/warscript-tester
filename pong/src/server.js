@@ -20,10 +20,19 @@ const server = http.createServer((req, res) => {
         }).on('end', () => {
             body = Buffer.concat(body).toString();
             let params = JSON.parse(body)
-            p = new Function("me", "enemy", "ball", "game", params.code);
-            res.setHeader("Content-Type", "application/json");
+
+            let errorText = ""
+            try {
+                p = new Function("me", "enemy", "ball", "game", "console", params.code);
+            } catch (err) {
+                errorText = `ERROR: ${err.name}; ${err.message};`
+            }
+            let resp = JSON.stringify({
+                "error": errorText,
+            })
+            res.setHeader('Content-Type', 'application/json');
             res.statusCode = 200;
-            res.end(params.code)
+            res.end(resp)
         });
     } else if (req.method === 'POST' && req.url === run) {
         let body = [];
@@ -40,6 +49,15 @@ const server = http.createServer((req, res) => {
             me.vY = params.me.vY
             me.height = params.me.height
             me.width = params.me.width
+            me.setMoveVector = function(speed, x, y) {
+                let nSpeed = speed / Math.sqrt(x * x + y * y);
+                if (isNaN(nSpeed) || nSpeed == Infinity) {
+                    nSpeed = 0;
+                }
+
+                this.vX = x * nSpeed;
+                this.vY = y * nSpeed;
+            }
 
             let enemy = {}
             enemy.x = params.enemy.x
@@ -62,22 +80,27 @@ const server = http.createServer((req, res) => {
             game.width = params.game.width
             game.ticks_left = params.game.ticks_left
 
-            me.setMoveVector = function(speed, x, y) {
-                let nSpeed = speed / Math.sqrt(x * x + y * y);
-                if (isNaN(nSpeed) || nSpeed == Infinity) {
-                    nSpeed = 0;
-                }
-
-                this.vX = x * nSpeed;
-                this.vY = y * nSpeed;
+            let cnsl = {}
+            cnsl.logs = []
+            cnsl.log = function(msg) {
+                this.logs.push(msg)
             }
 
-            p(me, enemy, ball, game)
+
+            let wasError = false
+            try {
+                p(me, enemy, ball, game, cnsl)
+            } catch (err) {
+                wasError = true
+                cnsl.logs.push(`ERROR: ${err.name}; ${err.message};`)
+            }
 
             let resp = JSON.stringify({
                 "me": me,
                 "enemy": enemy,
-                "ball": ball
+                "ball": ball,
+                "console": cnsl.logs,
+                "was_error": wasError
             })
             res.setHeader('Content-Type', 'application/json');
             res.end(resp)

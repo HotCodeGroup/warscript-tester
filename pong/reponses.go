@@ -16,6 +16,7 @@ type State struct {
 	Player1 object2D `json:"player_1"`
 	Player2 object2D `json:"player_2"`
 	Ball    object2D `json:"ball"`
+	Console []string `json:"console"`
 }
 
 // JSON - returns marshaled json

@@ -1,6 +1,7 @@
 package tester
 
 import (
+	"encoding/json"
 	"os"
 	"strconv"
 	"time"
@@ -17,6 +18,27 @@ type Tester struct {
 	dockerClient *docker.Client
 	ch           *amqp.Channel
 	ports        *PortsPool
+}
+
+type SendCodeResponce struct {
+	Error string `json:"error"`
+}
+
+func (s *SendCodeResponce) JSON() []byte {
+	// ну тут всего лишь строка)
+	body, _ := json.Marshal(struct {
+		Console []string `json:"console"`
+	}{
+		Console: []string{
+			s.Error,
+		},
+	})
+
+	return body
+}
+
+func (s *SendCodeResponce) GetWinner() int {
+	return 3
 }
 
 // NewTester создание нового объекта тестировщика
@@ -58,28 +80,56 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (info games.In
 		return nil, nil, nil, err
 	}
 	defer func() {
-		err := p2Container.Remove()
+		err = p2Container.Remove()
 		if err != nil {
 			returnErr = errors.Wrap(err, "can not remove p2 container")
 		}
 	}()
 
 	time.Sleep(1 * time.Second)
-	if _, err := p1Container.SendCode(rawCode1); err != nil {
-		returnErr = errors.Wrap(err, "can not init p1 container code")
-		return
-	}
-
-	if _, err := p2Container.SendCode(rawCode2); err != nil {
-		returnErr = errors.Wrap(err, "can not init p2 container code")
-		return
-	}
-
 	// main game loop
 	game.Init()
 
 	info = game.GetInfo()
 	states = make([]games.State, 0, 0)
+	respSendCode1, err := p1Container.SendCode(rawCode1)
+	if err != nil {
+		returnErr = errors.Wrap(err, "can not init p1 container code")
+		return
+	}
+
+	respSendCodeStatus1 := &SendCodeResponce{}
+	err = json.Unmarshal(respSendCode1, respSendCodeStatus1)
+	if err != nil {
+		returnErr = errors.Wrap(err, "can not unmarshal p1 container resp")
+		return
+	}
+
+	if respSendCodeStatus1.Error != "" {
+		states = append(states, respSendCodeStatus1)
+		result = respSendCodeStatus1
+		return
+	}
+
+	respSendCode2, err := p2Container.SendCode(rawCode2)
+	if err != nil {
+		returnErr = errors.Wrap(err, "can not init p2 container code")
+		return
+	}
+
+	respSendCodeStatus2 := &SendCodeResponce{}
+	err = json.Unmarshal(respSendCode2, respSendCodeStatus2)
+	if err != nil {
+		returnErr = errors.Wrap(err, "can not unmarshal p1 container resp")
+		return
+	}
+
+	if respSendCodeStatus2.Error != "" {
+		states = append(states, respSendCodeStatus2)
+		result = respSendCodeStatus2
+		return
+	}
+
 	for {
 		st1, st2 := game.Snapshots()
 		resp1, err1 := p1Container.SendState(st1)

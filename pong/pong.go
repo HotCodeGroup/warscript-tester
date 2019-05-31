@@ -2,6 +2,7 @@ package pong
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/HotCodeGroup/warscript-tester/games"
 
@@ -92,11 +93,17 @@ type gameShotInner struct {
 	TicksLeft int     `json:"ticks_left"`
 }
 
+type consoleInner struct {
+	Logs []string `json:"logs"`
+}
+
 type shot struct {
-	Me    shotInner     `json:"me"`
-	Enemy shotInner     `json:"enemy"`
-	Ball  shotInner     `json:"ball"`
-	Game  gameShotInner `json:"game"`
+	Me       shotInner     `json:"me"`
+	Enemy    shotInner     `json:"enemy"`
+	Ball     shotInner     `json:"ball"`
+	Game     gameShotInner `json:"game"`
+	Console  consoleInner  `json:"console"`
+	WasError bool          `json:"was_error"`
 }
 
 func (pong *Pong) createShot1() shot {
@@ -185,11 +192,27 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 		return errors.Wrap(err1, games.ErrPlayer1Fail.Error())
 	}
 
+	if s1.WasError {
+		pong.isEnded = true
+		pong.occuredError = &games.GameError{
+			Msg: strings.Join(s1.Console.Logs, "\n"),
+		}
+		return
+	}
+
 	err2 := json.Unmarshal(shot2, &s2)
 	if err2 != nil {
 		pong.isEnded = true
 		pong.occuredError = games.ErrPlayer2Fail
 		return errors.Wrap(err2, games.ErrPlayer2Fail.Error())
+	}
+
+	if s2.WasError {
+		pong.isEnded = true
+		pong.occuredError = &games.GameError{
+			Msg: strings.Join(s2.Console.Logs, "\n"),
+		}
+		return
 	}
 
 	pong.loadSnapShots(&s1, &s2)
