@@ -4,7 +4,7 @@ const loadcode = "/loadcode"
 const run = "/run"
 
 let ready = false
-let p = new Function("me", "enemy", "ball", "{}");
+let p = new Function("me", "enemy", "ball", "game", "console", "{}");
 
 const http = require('http');
 const {

@@ -120,7 +120,7 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (info games.In
 	respSendCodeStatus2 := &SendCodeResponce{}
 	err = json.Unmarshal(respSendCode2, respSendCodeStatus2)
 	if err != nil {
-		returnErr = errors.Wrap(err, "can not unmarshal p1 container resp")
+		returnErr = errors.Wrap(err, "can not unmarshal p2 container resp")
 		return
 	}
 
