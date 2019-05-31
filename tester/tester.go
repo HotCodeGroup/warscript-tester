@@ -42,12 +42,12 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (info games.In
 	port1, _ = strconv.Atoi(os.Getenv("PORT_1"))
 	port2, _ = strconv.Atoi(os.Getenv("PORT_2"))
 
-	p1Container, err := NewPlayerContainer(1, port1, im1, 10*time.Second, t.dockerClient)
+	p1Container, err := NewPlayerContainer(1, port1, im1, 60*time.Second, t.dockerClient)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 	defer func() {
-		err := p1Container.Remove()
+		err = p1Container.Remove()
 		if err != nil {
 			returnErr = errors.Wrap(err, "can not remove p1 container")
 		}
