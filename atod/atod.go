@@ -41,6 +41,7 @@ type projectile interface {
 	getY() float64
 	getVX() float64
 	getVY() float64
+	getDamage() float64
 }
 
 type dropzone struct {
@@ -57,6 +58,7 @@ type flag struct {
 
 // Atod - game of 2AtoD
 type Atod struct {
+	ticksLeft int
 	width     float64
 	heihgt    float64
 	obstacles []*obstacle

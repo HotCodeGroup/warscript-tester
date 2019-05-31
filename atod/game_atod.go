@@ -59,11 +59,12 @@ func (a *Atod) GetInfo() (info games.Info) {
 
 func (a *Atod) GetState() (state games.State, fin bool) {
 	return &State{
-		Obstacles: obstaclesToResp(a.obstacles),
-		P1Units:   unitsToResp(a.player1Units),
-		P2Units:   unitsToResp(a.player2Units),
-		P1Flags:   flagsToResp(a.flags1),
-		P2Flags:   flagsToResp(a.flags2),
+		Projectiles: projectilesToResp(a.projectiles),
+		Obstacles:   obstaclesToResp(a.obstacles),
+		P1Units:     unitsToResp(a.player1Units),
+		P2Units:     unitsToResp(a.player2Units),
+		P1Flags:     flagsToResp(a.flags1),
+		P2Flags:     flagsToResp(a.flags2),
 	}, a.isEnded
 }
 
@@ -73,11 +74,12 @@ func (a *Atod) GetResult() (result games.Result) {
 	}
 
 	return &Result{
-		Obstacles: obstaclesToResp(a.obstacles),
-		P1Units:   unitsToResp(a.player1Units),
-		P2Units:   unitsToResp(a.player2Units),
-		P1Flags:   flagsToResp(a.flags1),
-		P2Flags:   flagsToResp(a.flags2),
+		Projectiles: projectilesToResp(a.projectiles),
+		Obstacles:   obstaclesToResp(a.obstacles),
+		P1Units:     unitsToResp(a.player1Units),
+		P2Units:     unitsToResp(a.player2Units),
+		P1Flags:     flagsToResp(a.flags1),
+		P2Flags:     flagsToResp(a.flags2),
 
 		Winner: a.winner,
 		Error:  a.occuredError,

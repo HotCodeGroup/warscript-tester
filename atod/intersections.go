@@ -1,6 +1,8 @@
 package atod
 
-import "math"
+import (
+	"math"
+)
 
 func circleSectionInter(cX float64, cY float64, cR float64,
 	x1 float64, y1 float64, x2 float64, y2 float64) (int, float64, float64, float64, float64) {
@@ -67,4 +69,38 @@ func sectionsInter(l1 line, l2 line) (intersect bool, x float64, y float64) {
 		return
 	}
 	return
+}
+
+func moveCircle(pM float64, pS float64, rad float64, d float64, f float64, s float64, mv float64) float64 {
+	if f > s {
+		f, s = s, f
+	}
+	inv := false
+	if pM < d {
+		if mv < 0 {
+			return mv
+		}
+	} else {
+		if mv > 0 {
+			return mv
+		}
+		d, pM = pM, d
+		inv = true
+		mv = -mv
+	}
+	res := mv
+	if f <= pS && pS <= s {
+		res = math.Min(d-rad-pM, mv)
+	} else if pS-s < rad && pS-s > 0 {
+		shift := math.Sqrt(rad*rad - (pS-s)*(pS-s))
+		res = math.Min(d-shift-pM, mv)
+	} else if f-pS < rad && f-pS > 0 {
+		shift := math.Sqrt(rad*rad - (f-pS)*(f-pS))
+		res = math.Min(d-shift-pM, mv)
+	}
+
+	if inv {
+		return -res
+	}
+	return res
 }

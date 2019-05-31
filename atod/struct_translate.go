@@ -52,6 +52,20 @@ func dropzoneToResp(d dropzone) (r dropzoneResp) {
 	return
 }
 
+func projectilesToResp(ps []projectile) (r []projectileResp) {
+	r = make([]projectileResp, len(ps), len(ps))
+	for i, p := range ps {
+		r[i] = projectileResp{
+			X:    p.getX(),
+			Y:    p.getY(),
+			VX:   p.getVX(),
+			VY:   p.getVY(),
+			Type: p.getType(),
+		}
+	}
+	return
+}
+
 func obstaclesToShot(os []*obstacle) (r []obstacleShot) {
 	r = make([]obstacleShot, len(os), len(os))
 	for i, o := range os {

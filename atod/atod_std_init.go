@@ -7,18 +7,19 @@ import (
 )
 
 const (
-	stdObstAmount  = 10
-	stdHeight      = 1000
-	stdWidth       = 2000
-	stdSafeZone    = 350
-	stdDropZoneRad = 50
-	stdDropZoneX   = 100
-	stdDropZoneY   = 500
-	stdUnitRad     = 25
-	stdFlag1PosX   = 100
-	stdFlag1PosY   = 100
-	stdFlag2PosX   = 100
-	stdFlag2PosY   = 900
+	stdObstAmount     = 10
+	stdHeight         = 1000
+	stdWidth          = 2000
+	stdNoObstacleZone = 350
+	stdSafeZone       = 350
+	stdDropZoneRad    = 50
+	stdDropZoneX      = 100
+	stdDropZoneY      = 500
+	stdUnitRad        = 25
+	stdFlag1PosX      = 100
+	stdFlag1PosY      = 100
+	stdFlag2PosX      = 100
+	stdFlag2PosY      = 900
 )
 
 func stdField() *Atod {
@@ -78,7 +79,7 @@ func stdObstacles() []*obstacle {
 		height := float64(randS.Int63() % int64(stdHeight/20))
 		width := float64(randS.Int63() % int64(stdWidth/20))
 		x := float64(randS.Int63() % int64(stdHeight))
-		y := float64(randS.Int63() % int64(stdWidth))
+		y := stdNoObstacleZone + float64(randS.Int63()%int64(stdWidth-stdNoObstacleZone*2))
 
 		obstacles = append(obstacles, &obstacle{
 			width:  width,
@@ -191,6 +192,10 @@ func (b *stdBullet) getVX() float64 {
 
 func (b *stdBullet) getVY() float64 {
 	return b.vY
+}
+
+func (b *stdBullet) getDamage() float64 {
+	return b.damage
 }
 
 func bulletProducer(u *unit) func(float64, float64) projectile {

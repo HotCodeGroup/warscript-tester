@@ -37,13 +37,22 @@ type dropzoneResp struct {
 	Radius float64 `json:"radius"`
 }
 
+type projectileResp struct {
+	Type string
+	X    float64
+	Y    float64
+	VX   float64
+	VY   float64
+}
+
 // State - implements interface games.State
 type State struct {
-	Obstacles []obstacleResp `json:"obstacles"`
-	P1Units   []unitResp     `json:"p1_units"`
-	P2Units   []unitResp     `json:"p2_units"`
-	P1Flags   []flagResp     `json:"p1_flags"`
-	P2Flags   []flagResp     `json:"p2_flags"`
+	Obstacles   []obstacleResp   `json:"obstacles"`
+	Projectiles []projectileResp `json:"projectiles"`
+	P1Units     []unitResp       `json:"p1_units"`
+	P2Units     []unitResp       `json:"p2_units"`
+	P1Flags     []flagResp       `json:"p1_flags"`
+	P2Flags     []flagResp       `json:"p2_flags"`
 }
 
 // JSON - returns marshaled json
@@ -67,11 +76,12 @@ func (i *Info) JSON() []byte {
 
 // Result - implements interface games.Result
 type Result struct {
-	Obstacles []obstacleResp `json:"obstacles"`
-	P1Units   []unitResp     `json:"p1_units"`
-	P2Units   []unitResp     `json:"p2_units"`
-	P1Flags   []flagResp     `json:"p1_flags"`
-	P2Flags   []flagResp     `json:"p2_flags"`
+	Obstacles   []obstacleResp   `json:"obstacles"`
+	Projectiles []projectileResp `json:"projectiles"`
+	P1Units     []unitResp       `json:"p1_units"`
+	P2Units     []unitResp       `json:"p2_units"`
+	P1Flags     []flagResp       `json:"p1_flags"`
+	P2Flags     []flagResp       `json:"p2_flags"`
 
 	Winner  int `json:"winner"`
 	Error   *games.GameError
