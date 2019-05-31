@@ -1,6 +1,6 @@
 # Warscript Tester
 
-[![rcard](https://goreportcard.com/badge/github.com/HotCodeGroup/warscript-tester)](https://goreportcard.com/report/github.com/HotCodeGroup/warscript-tester)
+[![rcard](https://goreportcard.com/badge/github.com/HotCodeGroup/warscript-tester?service=github)](https://goreportcard.com/report/github.com/HotCodeGroup/warscript-tester)
 
 🤖 Service for bot testing
 
