@@ -93,16 +93,12 @@ type gameShotInner struct {
 	TicksLeft int     `json:"ticks_left"`
 }
 
-type consoleInner struct {
-	Logs []string `json:"logs"`
-}
-
 type shot struct {
 	Me       shotInner     `json:"me"`
 	Enemy    shotInner     `json:"enemy"`
 	Ball     shotInner     `json:"ball"`
 	Game     gameShotInner `json:"game"`
-	Console  consoleInner  `json:"console"`
+	Console  []string      `json:"console"`
 	WasError bool          `json:"was_error"`
 }
 
@@ -195,7 +191,7 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 	if s1.WasError {
 		pong.isEnded = true
 		pong.occuredError = &games.GameError{
-			Msg: strings.Join(s1.Console.Logs, "\n"),
+			Msg: strings.Join(s1.Console, "\n"),
 		}
 		return
 	}
@@ -210,7 +206,7 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 	if s2.WasError {
 		pong.isEnded = true
 		pong.occuredError = &games.GameError{
-			Msg: strings.Join(s2.Console.Logs, "\n"),
+			Msg: strings.Join(s2.Console, "\n"),
 		}
 		return
 	}
