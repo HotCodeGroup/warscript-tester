@@ -58,11 +58,11 @@ type line struct {
 	end point
 }
 
-func vMult(ax float64, ay float64, bx float64, by float64) float64 {
+func vMult(ax, ay, bx, by float64) float64 {
 	return ax*by - bx*ay
 }
 
-func intersection(l1 line, l2 line) (intersect bool, x float64, y float64) {
+func intersection(l1, l2 line) (intersect bool, x, y float64) {
 	v1 := vMult(l2.end.x-l2.beg.x, l2.end.y-l2.beg.y, l1.beg.x-l2.beg.x, l1.beg.y-l2.beg.y)
 	v2 := vMult(l2.end.x-l2.beg.x, l2.end.y-l2.beg.y, l1.end.x-l2.beg.x, l1.end.y-l2.beg.y)
 	v3 := vMult(l1.end.x-l1.beg.x, l1.end.y-l1.beg.y, l2.beg.x-l1.beg.x, l2.beg.y-l1.beg.y)
@@ -95,7 +95,6 @@ func collidePlayerBall(player *Movable, ball *Movable) (isColliding bool, collis
 	// translate to player's fixed system
 	ball.vX -= player.vX
 	ball.vY -= player.vY
-	// fmt.Printf("ball: %+v\nplayer: %+v\n\n", *ball, *player)
 	collisionSide = none
 	defer func() {
 		ball.vX += player.vX
@@ -302,7 +301,7 @@ func movePlayerWithBall(player *Movable, ball *Movable, up, down, left, right fl
 		ball.y += ball.vY - player.vY
 	}
 
-	//setting ball speed
+	// setting ball speed
 	if bounceSpeedCorr {
 		xDir := ball.x - player.x
 		yDir := ball.y - player.y

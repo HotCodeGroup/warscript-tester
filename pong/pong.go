@@ -78,37 +78,57 @@ func (pong *Pong) Images() (im1, im2 string) {
 }
 
 type shotInner struct {
-	X  float64 `json:"x"`
-	Y  float64 `json:"y"`
-	VX float64 `json:"vX"`
-	VY float64 `json:"vY"`
+	X      float64 `json:"x"`
+	Y      float64 `json:"y"`
+	VX     float64 `json:"vX"`
+	VY     float64 `json:"vY"`
+	Height float64 `json:"height"`
+	Width  float64 `json:"width"`
+}
+
+type gameShotInner struct {
+	Height    float64 `json:"height"`
+	Width     float64 `json:"width"`
+	TicksLeft int     `json:"ticks_left"`
 }
 
 type shot struct {
-	Me    shotInner `json:"me"`
-	Enemy shotInner `json:"enemy"`
-	Ball  shotInner `json:"ball"`
+	Me    shotInner     `json:"me"`
+	Enemy shotInner     `json:"enemy"`
+	Ball  shotInner     `json:"ball"`
+	Game  gameShotInner `json:"game"`
 }
 
 func (pong *Pong) createShot1() shot {
 	return shot{
 		Me: shotInner{
-			X:  pong.player1.x,
-			Y:  pong.player1.y,
-			VX: pong.player1.vX,
-			VY: pong.player1.vY,
+			X:      pong.player1.x,
+			Y:      pong.player1.y,
+			VX:     pong.player1.vX,
+			VY:     pong.player1.vY,
+			Height: pong.player1.height,
+			Width:  pong.player1.width,
 		},
 		Enemy: shotInner{
-			X:  pong.player2.x,
-			Y:  pong.player2.y,
-			VX: pong.player2.vX,
-			VY: pong.player2.vY,
+			X:      pong.player2.x,
+			Y:      pong.player2.y,
+			VX:     pong.player2.vX,
+			VY:     pong.player2.vY,
+			Height: pong.player2.height,
+			Width:  pong.player1.width,
 		},
 		Ball: shotInner{
-			X:  pong.ball.x,
-			Y:  pong.ball.y,
-			VX: pong.ball.vX,
-			VY: pong.ball.vY,
+			X:      pong.ball.x,
+			Y:      pong.ball.y,
+			VX:     pong.ball.vX,
+			VY:     pong.ball.vY,
+			Height: pong.ball.height,
+			Width:  pong.ball.width,
+		},
+		Game: gameShotInner{
+			Height:    pong.height,
+			Width:     pong.width,
+			TicksLeft: pong.ticksLeft,
 		},
 	}
 }
@@ -116,22 +136,33 @@ func (pong *Pong) createShot1() shot {
 func (pong *Pong) createShot2() shot {
 	return shot{
 		Me: shotInner{
-			X:  pong.width - pong.player2.x,
-			Y:  pong.height - pong.player2.y,
-			VX: -pong.player2.vX,
-			VY: -pong.player2.vY,
+			X:      pong.width - pong.player2.x,
+			Y:      pong.height - pong.player2.y,
+			VX:     -pong.player2.vX,
+			VY:     -pong.player2.vY,
+			Height: pong.player2.height,
+			Width:  pong.player2.width,
 		},
 		Enemy: shotInner{
-			X:  pong.width - pong.player1.x,
-			Y:  pong.height - pong.player1.y,
-			VX: -pong.player1.vX,
-			VY: -pong.player1.vY,
+			X:      pong.width - pong.player1.x,
+			Y:      pong.height - pong.player1.y,
+			VX:     -pong.player1.vX,
+			VY:     -pong.player1.vY,
+			Height: pong.player1.height,
+			Width:  pong.player1.width,
 		},
 		Ball: shotInner{
-			X:  pong.width - pong.ball.x,
-			Y:  pong.height - pong.ball.y,
-			VX: -pong.ball.vX,
-			VY: -pong.ball.vY,
+			X:      pong.width - pong.ball.x,
+			Y:      pong.height - pong.ball.y,
+			VX:     -pong.ball.vX,
+			VY:     -pong.ball.vY,
+			Height: pong.ball.height,
+			Width:  pong.ball.width,
+		},
+		Game: gameShotInner{
+			Height:    pong.height,
+			Width:     pong.width,
+			TicksLeft: pong.ticksLeft,
 		},
 	}
 }

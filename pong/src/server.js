@@ -20,7 +20,7 @@ const server = http.createServer((req, res) => {
         }).on('end', () => {
             body = Buffer.concat(body).toString();
             let params = JSON.parse(body)
-            p = new Function("me", "enemy", "ball", params.code);
+            p = new Function("me", "enemy", "ball", "game", params.code);
             res.setHeader("Content-Type", "application/json");
             res.statusCode = 200;
             res.end(params.code)
@@ -38,18 +38,29 @@ const server = http.createServer((req, res) => {
             me.y = params.me.y
             me.vX = params.me.vX
             me.vY = params.me.vY
+            me.height = params.me.height
+            me.width = params.me.width
 
             let enemy = {}
             enemy.x = params.enemy.x
             enemy.y = params.enemy.y
             enemy.vX = params.enemy.vX
             enemy.vY = params.enemy.vY
+            enemy.height = params.enemy.height
+            enemy.width = params.enemy.width
 
             let ball = {}
             ball.x = params.ball.x
             ball.y = params.ball.y
             ball.vX = params.ball.vX
             ball.vY = params.ball.vY
+            ball.height = params.ball.height
+            ball.width = params.ball.width
+
+            let game = {}
+            game.height = params.game.height
+            game.width = params.game.width
+            game.ticks_left = params.game.ticks_left
 
             me.setMoveVector = function(speed, x, y) {
                 let nSpeed = speed / Math.sqrt(x * x + y * y);
