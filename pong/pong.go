@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/HotCodeGroup/warscript-tester/games"
+
 	"github.com/pkg/errors"
 )
 
@@ -72,7 +73,7 @@ func (pong *Pong) Init() {
 }
 
 // Images - returns names of images
-func (pong *Pong) Images() (string, string) {
+func (pong *Pong) Images() (im1, im2 string) {
 	return image, image
 }
 
@@ -143,6 +144,7 @@ func (pong *Pong) Snapshots() (shot1, shot2 []byte) {
 	return
 }
 
+// SaveSnapshots сохранение состояния игры
 func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 	var s1, s2 shot
 	err1 := json.Unmarshal(shot1, &s1)
@@ -159,11 +161,11 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 		return errors.Wrap(err2, games.ErrPlayer2Fail.Error())
 	}
 
-	pong.loadSnapShots(s1, s2)
-
+	pong.loadSnapShots(&s1, &s2)
 	return nil
 }
 
+// GetInfo получение информации об объектах игры
 func (pong *Pong) GetInfo() games.Info {
 	i := &Info{}
 	i.Ball.Diameter = pong.ball.height / pong.height
@@ -174,6 +176,7 @@ func (pong *Pong) GetInfo() games.Info {
 	return i
 }
 
+// GetState получение текущего состояния игры
 func (pong *Pong) GetState() (state games.State, fin bool) {
 	return &State{
 		Player1: object2D{
@@ -191,6 +194,7 @@ func (pong *Pong) GetState() (state games.State, fin bool) {
 	}, pong.isEnded
 }
 
+// GetResult получение результата игры
 func (pong *Pong) GetResult() (result games.Result) {
 	if !pong.isEnded {
 		return nil

@@ -11,7 +11,7 @@ type intersectionTest struct {
 }
 
 var intersectionTests = []intersectionTest{
-	intersectionTest{
+	{
 		line1: line{
 			beg: point{
 				x: 1, y: 1,
@@ -30,7 +30,7 @@ var intersectionTests = []intersectionTest{
 		},
 		ans: true,
 	},
-	intersectionTest{
+	{
 		line1: line{
 			beg: point{
 				x: 1, y: 1,
@@ -49,7 +49,7 @@ var intersectionTests = []intersectionTest{
 		},
 		ans: false,
 	},
-	intersectionTest{
+	{
 		line1: line{
 			beg: point{
 				x: 0, y: 0,
@@ -68,7 +68,7 @@ var intersectionTests = []intersectionTest{
 		},
 		ans: true,
 	},
-	intersectionTest{
+	{
 		line1: line{
 			beg: point{
 				x: 0, y: 0,
@@ -87,7 +87,7 @@ var intersectionTests = []intersectionTest{
 		},
 		ans: false,
 	},
-	intersectionTest{
+	{
 		line1: line{
 			beg: point{
 				x: -10, y: 0,
@@ -106,7 +106,7 @@ var intersectionTests = []intersectionTest{
 		},
 		ans: true,
 	},
-	intersectionTest{
+	{
 		line1: line{
 			beg: point{
 				x: 10, y: 0,

@@ -4,6 +4,7 @@ import (
 	"sync"
 )
 
+// PortsPool пул портов для запуска контейнеров
 type PortsPool struct {
 	mu    *sync.Mutex
 	ports map[int]bool
@@ -33,6 +34,7 @@ func newPortsPool() *PortsPool {
 	}
 }
 
+// GetPort возвращает своболный порт
 func (a *PortsPool) GetPort() int {
 	for {
 		a.mu.Lock()
@@ -47,6 +49,7 @@ func (a *PortsPool) GetPort() int {
 	}
 }
 
+// Free освобождает использованный порт
 func (a *PortsPool) Free(port int) {
 	a.mu.Lock()
 	defer a.mu.Unlock()
