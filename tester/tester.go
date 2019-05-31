@@ -53,7 +53,7 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (info games.In
 		}
 	}()
 
-	p2Container, err := NewPlayerContainer(2, port2, im2, 10*time.Second, t.dockerClient)
+	p2Container, err := NewPlayerContainer(2, port2, im2, 60*time.Second, t.dockerClient)
 	if err != nil {
 		return nil, nil, nil, err
 	}

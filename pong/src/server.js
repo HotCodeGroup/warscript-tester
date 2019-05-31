@@ -72,7 +72,7 @@ const server = http.createServer((req, res) => {
                 this.vY = y * nSpeed;
             }
 
-            p(me, enemy, ball)
+            p(me, enemy, ball, game)
 
             let resp = JSON.stringify({
                 "me": me,
