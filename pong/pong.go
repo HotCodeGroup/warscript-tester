@@ -166,7 +166,7 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 
 func (pong *Pong) GetInfo() games.Info {
 	i := &Info{}
-	i.Ball.Diameter = pong.ball.width / pong.width
+	i.Ball.Diameter = pong.ball.height / pong.height
 	i.Racket.Height = pong.player1.height / pong.height
 	i.Racket.Width = pong.player1.width / pong.width
 	i.Ratio = pong.width / pong.height

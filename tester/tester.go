@@ -1,6 +1,8 @@
 package tester
 
 import (
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/HotCodeGroup/warscript-tester/games"
@@ -28,12 +30,15 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (info games.In
 	im1, im2 := game.Images()
 
 	port1 := t.ports.GetPort()
-	defer t.ports.Free(port1)
+        defer t.ports.Free(port1)
 
-	port2 := t.ports.GetPort()
-	defer t.ports.Free(port2)
+        port2 := t.ports.GetPort()
+        defer t.ports.Free(port2)
 
-	p1Container, err := NewPlayerContainer(1, port1, im1, 10*time.Second, t.dockerClient)
+        port1, _ = strconv.Atoi(os.Getenv("PORT_1"))
+        port2, _ = strconv.Atoi(os.Getenv("PORT_2"))
+
+	p1Container, err := NewPlayerContainer(1, port1, im1, 60*time.Second, t.dockerClient)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -44,7 +49,7 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (info games.In
 		}
 	}()
 
-	p2Container, err := NewPlayerContainer(2, port2, im2, 10*time.Second, t.dockerClient)
+	p2Container, err := NewPlayerContainer(2, port2, im2, 60*time.Second, t.dockerClient)
 	if err != nil {
 		return nil, nil, nil, err
 	}
