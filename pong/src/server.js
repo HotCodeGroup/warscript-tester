@@ -91,8 +91,8 @@ const server = http.createServer((req, res) => {
             try {
                 p(me, enemy, ball, game, cnsl)
             } catch (err) {
-                errorText = `ERROR: ${err.name}; ${err.message};`
-                cnsl.logs.push(`ERROR: ${err.name}; ${err.message};`)
+                errorText = `[TICK: ${10000 - params.game.ticks_left}] ERROR: ${err.name}; ${err.message};`
+                cnsl.logs.push(`[TICK: ${10000 - params.game.ticks_left}] ERROR: ${err.name}; ${err.message};`)
             }
 
             let resp = JSON.stringify({
