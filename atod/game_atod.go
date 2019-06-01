@@ -49,8 +49,8 @@ func (a *Atod) SaveSnapshots(shot1, shot2 []byte) error {
 
 func (a *Atod) GetInfo() (info games.Info) {
 	i := &Info{
-		Player1Dropzone: dropzoneToResp(a.dropzone1),
-		Player2Dropzone: dropzoneToResp(a.dropzone2),
+		Player1Dropzone: dropzoneToResp(a.dropzone1, a.heihgt, a.width),
+		Player2Dropzone: dropzoneToResp(a.dropzone2, a.heihgt, a.width),
 		Ratio:           a.width / a.heihgt,
 	}
 
@@ -59,12 +59,12 @@ func (a *Atod) GetInfo() (info games.Info) {
 
 func (a *Atod) GetState() (state games.State, fin bool) {
 	return &State{
-		Projectiles: projectilesToResp(a.projectiles),
-		Obstacles:   obstaclesToResp(a.obstacles),
-		P1Units:     unitsToResp(a.player1Units),
-		P2Units:     unitsToResp(a.player2Units),
-		P1Flags:     flagsToResp(a.flags1),
-		P2Flags:     flagsToResp(a.flags2),
+		Projectiles: projectilesToResp(a.projectiles, a.heihgt, a.width),
+		Obstacles:   obstaclesToResp(a.obstacles, a.heihgt, a.width),
+		P1Units:     unitsToResp(a.player1Units, a.heihgt, a.width),
+		P2Units:     unitsToResp(a.player2Units, a.heihgt, a.width),
+		P1Flags:     flagsToResp(a.flags1, a.heihgt, a.width),
+		P2Flags:     flagsToResp(a.flags2, a.heihgt, a.width),
 	}, a.isEnded
 }
 
@@ -74,12 +74,12 @@ func (a *Atod) GetResult() (result games.Result) {
 	}
 
 	return &Result{
-		Projectiles: projectilesToResp(a.projectiles),
-		Obstacles:   obstaclesToResp(a.obstacles),
-		P1Units:     unitsToResp(a.player1Units),
-		P2Units:     unitsToResp(a.player2Units),
-		P1Flags:     flagsToResp(a.flags1),
-		P2Flags:     flagsToResp(a.flags2),
+		Projectiles: projectilesToResp(a.projectiles, a.heihgt, a.width),
+		Obstacles:   obstaclesToResp(a.obstacles, a.heihgt, a.width),
+		P1Units:     unitsToResp(a.player1Units, a.heihgt, a.width),
+		P2Units:     unitsToResp(a.player2Units, a.heihgt, a.width),
+		P1Flags:     flagsToResp(a.flags1, a.heihgt, a.width),
+		P2Flags:     flagsToResp(a.flags2, a.heihgt, a.width),
 
 		Winner: a.winner,
 		Error:  a.occuredError,

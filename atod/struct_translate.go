@@ -1,27 +1,27 @@
 package atod
 
-func obstaclesToResp(os []*obstacle) (r []obstacleResp) {
+func obstaclesToResp(os []*obstacle, height float64, width float64) (r []obstacleResp) {
 	r = make([]obstacleResp, len(os), len(os))
 	for i, o := range os {
 		r[i] = obstacleResp{
-			X:      o.x,
-			Y:      o.y,
-			Height: o.height,
-			Width:  o.width,
+			X:      o.x / width,
+			Y:      o.y / height,
+			Height: o.height / height,
+			Width:  o.width / width,
 		}
 	}
 	return
 }
 
-func unitsToResp(us []*unit) (r []unitResp) {
+func unitsToResp(us []*unit, height float64, width float64) (r []unitResp) {
 	r = make([]unitResp, len(us), len(us))
 	for i, u := range us {
 		r[i] = unitResp{
-			X:           u.x,
-			Y:           u.y,
-			Radius:      u.radius,
+			X:           u.x / width,
+			Y:           u.y / height,
+			Radius:      u.radius / height,
 			Health:      u.health,
-			ViewRange:   u.viewRange,
+			ViewRange:   u.viewRange / height,
 			ReloadLeft:  u.reloadLeft,
 			ReloadTime:  u.reloadTime,
 			SpecialLeft: u.specialLeft,
@@ -32,34 +32,34 @@ func unitsToResp(us []*unit) (r []unitResp) {
 	return
 }
 
-func flagsToResp(fs []*flag) (r []flagResp) {
+func flagsToResp(fs []*flag, height float64, width float64) (r []flagResp) {
 	r = make([]flagResp, len(fs), len(fs))
 	for i, f := range fs {
 		r[i] = flagResp{
-			X: f.x,
-			Y: f.y,
+			X: f.x / width,
+			Y: f.y / height,
 		}
 	}
 	return
 }
 
-func dropzoneToResp(d dropzone) (r dropzoneResp) {
+func dropzoneToResp(d dropzone, height float64, width float64) (r dropzoneResp) {
 	r = dropzoneResp{
-		X:      d.x,
-		Y:      d.y,
-		Radius: d.radius,
+		X:      d.x / width,
+		Y:      d.y / height,
+		Radius: d.radius / height,
 	}
 	return
 }
 
-func projectilesToResp(ps []projectile) (r []projectileResp) {
+func projectilesToResp(ps []projectile, height float64, width float64) (r []projectileResp) {
 	r = make([]projectileResp, len(ps), len(ps))
 	for i, p := range ps {
 		r[i] = projectileResp{
-			X:    p.getX(),
-			Y:    p.getY(),
-			VX:   p.getVX(),
-			VY:   p.getVY(),
+			X:    p.getX() / width,
+			Y:    p.getY() / height,
+			VX:   p.getVX() / width,
+			VY:   p.getVY() / height,
 			Type: p.getType(),
 		}
 	}
