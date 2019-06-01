@@ -296,7 +296,7 @@ func stdUnits(reversed bool) []*unit {
 		reloadLeft:   0,
 		specialTime:  0,
 		specialLeft:  0,
-		unitType:     "soldier",
+		unitType:     "soldier1",
 	}
 	sld1.shot = bulletProducer(sld1)
 	sld2 := &unit{
@@ -315,7 +315,7 @@ func stdUnits(reversed bool) []*unit {
 		reloadLeft:   0,
 		specialTime:  0,
 		specialLeft:  0,
-		unitType:     "soldier",
+		unitType:     "soldier2",
 	}
 	sld2.shot = bulletProducer(sld2)
 
