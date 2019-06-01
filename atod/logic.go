@@ -148,7 +148,7 @@ func (a *Atod) moveUnits(un []*unit) {
 		movedY := true
 		for movedY {
 			_, deltaX = a.moveUnitX(u, deltaX)
-			movedY, deltaY = a.moveUnitX(u, deltaY)
+			movedY, deltaY = a.moveUnitY(u, deltaY)
 		}
 
 		if u.carriedFlag != nil {
@@ -172,19 +172,21 @@ func (a *Atod) moveUnitX(u *unit, delta float64) (bool, float64) {
 					obst.x-obst.width/2, obst.y-obst.height/2, obst.y+obst.height/2, delta),
 			)
 		}
+		movement = math.Min(movement, a.width-u.radius-u.x)
 	} else {
 		adj = lEPS
 		for _, obst := range a.obstacles {
-			movement = math.Min(
+			movement = math.Max(
 				movement,
 				moveCircle(u.x, u.y, u.radius,
-					obst.x+obst.width/2, obst.y+obst.height/2, obst.y+obst.height/2, delta),
+					obst.x+obst.width/2, obst.y-obst.height/2, obst.y+obst.height/2, delta),
 			)
 		}
+		movement = math.Max(movement, 0+u.radius-u.x)
 	}
 
 	u.x += movement + adj
-	return math.Abs(movement) > lEPS, delta - movement - adj
+	return math.Abs(movement) > lEPS*10, delta - movement - adj
 }
 
 func (a *Atod) moveUnitY(u *unit, delta float64) (bool, float64) {
@@ -201,19 +203,21 @@ func (a *Atod) moveUnitY(u *unit, delta float64) (bool, float64) {
 					obst.y-obst.height/2, obst.x-obst.width/2, obst.x+obst.width/2, delta),
 			)
 		}
+		movement = math.Min(movement, a.heihgt-u.radius-u.y)
 	} else {
 		adj = lEPS
 		for _, obst := range a.obstacles {
-			movement = math.Min(
+			movement = math.Max(
 				movement,
 				moveCircle(u.y, u.x, u.radius,
 					obst.y+obst.height/2, obst.x-obst.width/2, obst.x+obst.width/2, delta),
 			)
 		}
+		movement = math.Max(movement, 0+u.radius-u.y)
 	}
 
 	u.y += movement + adj
-	return math.Abs(movement) > lEPS, delta - movement - adj
+	return math.Abs(movement) > lEPS*10, delta - movement - adj
 }
 
 func (a *Atod) checkWinner() int {
@@ -251,6 +255,7 @@ func (a *Atod) checkWinner() int {
 	}
 
 	if len(f1) == 0 || len(f2) == 0 || p1ct == 0 || p2ct == 0 {
+		a.ticksLeft = 0
 		if len(f1) == len(f2) {
 			if p1ct > p2ct {
 				return 1

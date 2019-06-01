@@ -323,7 +323,7 @@ func stdUnits(reversed bool) []*unit {
 	if reversed {
 		for _, u := range units {
 			u.x = stdWidth - u.x
-			u.y = stdWidth - u.y
+			u.y = stdHeight - u.y
 		}
 	}
 	return units
