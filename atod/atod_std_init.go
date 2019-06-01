@@ -67,9 +67,8 @@ func stdField() *Atod {
 				carrier: nil,
 			},
 		},
-		winner:       0,
-		isEnded:      false,
-		occuredError: nil,
+		winner:  0,
+		isEnded: false,
 	}
 }
 

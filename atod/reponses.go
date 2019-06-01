@@ -2,8 +2,6 @@ package atod
 
 import (
 	"encoding/json"
-
-	"github.com/HotCodeGroup/warscript-tester/games"
 )
 
 type obstacleResp struct {
@@ -83,14 +81,23 @@ type Result struct {
 	P1Flags     []flagResp       `json:"p1_flags"`
 	P2Flags     []flagResp       `json:"p2_flags"`
 
-	Winner  int `json:"winner"`
-	Error   *games.GameError
+	Err1    string `json:"error_1"`
+	Err2    string `json:"error_2"`
+	Winner  int    `json:"winner"`
 	Message string `json:"msg,omitempty"`
 }
 
 // GetWinner - returns winner of the game
 func (res *Result) GetWinner() int {
 	return res.Winner
+}
+
+func (res *Result) Error1() string {
+	return res.Err1
+}
+
+func (res *Result) Error2() string {
+	return res.Err2
 }
 
 // JSON - returns marshaled json

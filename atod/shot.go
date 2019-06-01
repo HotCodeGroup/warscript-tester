@@ -66,11 +66,11 @@ func (s *dropzoneShot) inverse(height float64, width float64) {
 }
 
 type projectileShot struct {
-	Type string
-	X    float64
-	Y    float64
-	VX   float64
-	VY   float64
+	Type string  `json:"type"`
+	X    float64 `json:"x"`
+	Y    float64 `json:"y"`
+	VX   float64 `json:"vX"`
+	VY   float64 `json:"vY"`
 }
 
 func (s *projectileShot) inverse(height float64, width float64) {

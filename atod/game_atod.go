@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/HotCodeGroup/warscript-tester/games"
+
 	"github.com/pkg/errors"
 )
 
@@ -32,14 +33,14 @@ func (a *Atod) SaveSnapshots(shot1, shot2 []byte) error {
 	err1 := json.Unmarshal(shot1, &s1)
 	if err1 != nil {
 		a.isEnded = true
-		a.occuredError = games.ErrPlayer1Fail
+		a.Error1 = games.ErrPlayer1Fail.Msg
 		return errors.Wrap(err1, games.ErrPlayer1Fail.Error())
 	}
 
 	err2 := json.Unmarshal(shot2, &s2)
 	if err2 != nil {
 		a.isEnded = true
-		a.occuredError = games.ErrPlayer2Fail
+		a.Error2 = games.ErrPlayer2Fail.Msg
 		return errors.Wrap(err2, games.ErrPlayer2Fail.Error())
 	}
 
@@ -82,6 +83,7 @@ func (a *Atod) GetResult() (result games.Result) {
 		P2Flags:     flagsToResp(a.flags2, a.heihgt, a.width),
 
 		Winner: a.winner,
-		Error:  a.occuredError,
+		Err1:   a.Error1,
+		Err2:   a.Error2,
 	}
 }

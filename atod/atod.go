@@ -1,7 +1,5 @@
 package atod
 
-import "github.com/HotCodeGroup/warscript-tester/games"
-
 type obstacle struct {
 	width  float64
 	height float64
@@ -72,7 +70,8 @@ type Atod struct {
 	flags1       []*flag
 	flags2       []*flag
 
-	winner       int
-	isEnded      bool
-	occuredError *games.GameError
+	winner  int
+	isEnded bool
+	Error1  string
+	Error2  string
 }
