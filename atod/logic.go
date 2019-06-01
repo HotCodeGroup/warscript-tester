@@ -240,8 +240,8 @@ func (a *Atod) checkWinner() int {
 	f2 := make([]*flag, 0, 0)
 	for _, f := range a.flags2 {
 		if !(f.carrier == nil &&
-			math.Abs(f.x-a.dropzone2.x) < a.dropzone1.radius &&
-			math.Abs(f.y-a.dropzone2.y) < a.dropzone1.radius) {
+			math.Abs(f.x-a.dropzone1.x) < a.dropzone1.radius &&
+			math.Abs(f.y-a.dropzone1.y) < a.dropzone1.radius) {
 
 			f2 = append(f2, f)
 		}
