@@ -28,6 +28,18 @@ func (a *Atod) Snapshots() (shot1, shot2 []byte) {
 	return
 }
 
+func checkLogsLen(logs []string) bool {
+	if len(logs) > 10 {
+		return false
+	}
+	for _, l := range logs {
+		if len(l) > 150 {
+			return false
+		}
+	}
+	return true
+}
+
 func (a *Atod) SaveSnapshots(shot1, shot2 []byte) error {
 	var s1, s2 shot
 	err1 := json.Unmarshal(shot1, &s1)
@@ -37,6 +49,9 @@ func (a *Atod) SaveSnapshots(shot1, shot2 []byte) error {
 		return errors.Wrap(err1, games.ErrPlayer1Fail.Error())
 	}
 
+	if checkLogsLen(a.logs1) {
+		a.logs1 = append(a.logs1, s1.Console...)
+	}
 	if s1.Error != "" {
 		a.isEnded = true
 		a.Error1 = s1.Error
@@ -51,6 +66,9 @@ func (a *Atod) SaveSnapshots(shot1, shot2 []byte) error {
 		return errors.Wrap(err2, games.ErrPlayer2Fail.Error())
 	}
 
+	if checkLogsLen(a.logs2) {
+		a.logs2 = append(a.logs2, s2.Console...)
+	}
 	if s2.Error != "" {
 		a.isEnded = true
 		a.Error2 = s2.Error
@@ -104,4 +122,8 @@ func (a *Atod) GetResult() (result games.Result) {
 		Err1:   a.Error1,
 		Err2:   a.Error2,
 	}
+}
+
+func (a *Atod) GetLogs() (logs1, logs2 []string) {
+	return a.logs1, a.logs2
 }

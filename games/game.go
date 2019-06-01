@@ -27,6 +27,7 @@ type Game interface {
 	GetInfo() (info Info)
 	GetState() (state State, fin bool)
 	GetResult() (result Result)
+	GetLogs() ([]string, []string)
 }
 
 // GameError ошибка, возникшая при проверки игры

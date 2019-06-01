@@ -35,7 +35,7 @@ func NewTester(d *docker.Client, ch *amqp.Channel) *Tester {
 
 // Test - tests bots submitted as RawCode1 and Rawcode2 by game rules
 func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (info games.Info,
-	states []games.State, result games.Result, returnErr error) {
+	states []games.State, logs1 []string, logs2 []string, result games.Result, returnErr error) {
 	im1, im2 := game.Images()
 
 	port1 := t.ports.GetPort()
@@ -49,7 +49,7 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (info games.In
 
 	p1Container, err := NewPlayerContainer(1, port1, im1, 60*time.Second, t.dockerClient)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
 	defer func() {
 		err = p1Container.Remove()
@@ -60,7 +60,7 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (info games.In
 
 	p2Container, err := NewPlayerContainer(2, port2, im2, 60*time.Second, t.dockerClient)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, nil, err
 	}
 	defer func() {
 		err = p2Container.Remove()
@@ -133,6 +133,7 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (info games.In
 		state, fin := game.GetState()
 		states = append(states, state)
 		if fin {
+			logs1, logs2 = game.GetLogs()
 			result = game.GetResult()
 			return
 		}

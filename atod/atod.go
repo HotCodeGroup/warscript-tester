@@ -70,6 +70,9 @@ type Atod struct {
 	flags1       []*flag
 	flags2       []*flag
 
+	logs1 []string
+	logs2 []string
+
 	winner  int
 	isEnded bool
 	Error1  string

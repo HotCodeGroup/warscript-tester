@@ -32,6 +32,9 @@ type Pong struct {
 	Error2    string
 	Memory1   json.RawMessage
 	Memory2   json.RawMessage
+
+	logs1 []string
+	logs2 []string
 }
 
 const (
@@ -186,6 +189,18 @@ func (pong *Pong) Snapshots() (shot1, shot2 []byte) {
 	return
 }
 
+func checkLogsLen(logs []string) bool {
+	if len(logs) > 10 {
+		return false
+	}
+	for _, l := range logs {
+		if len(l) > 150 {
+			return false
+		}
+	}
+	return true
+}
+
 // SaveSnapshots сохранение состояния игры
 func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 	var s1, s2 shot
@@ -196,6 +211,9 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 		return errors.Wrap(err1, games.ErrPlayer1Fail.Error())
 	}
 
+	if checkLogsLen(pong.logs1) {
+		pong.logs1 = append(pong.logs1, s1.Console...)
+	}
 	if s1.Error != "" {
 		pong.isEnded = true
 		pong.Error1 = s1.Error
@@ -213,6 +231,9 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 		return errors.Wrap(err2, games.ErrPlayer2Fail.Error())
 	}
 
+	if checkLogsLen(pong.logs2) {
+		pong.logs2 = append(pong.logs2, s2.Console...)
+	}
 	if s2.Error != "" {
 		pong.isEnded = true
 		pong.Error2 = s2.Error
@@ -277,4 +298,8 @@ func (pong *Pong) GetResult() (result games.Result) {
 			Y: pong.ball.y / pong.height,
 		},
 	}
+}
+
+func (pong *Pong) GetLogs() (logs1, logs2 []string) {
+	return pong.logs1, pong.logs2
 }

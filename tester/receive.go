@@ -35,6 +35,8 @@ type StatusResult struct {
 	Winner int           `json:"result"`
 	Error1 string        `json:"error_1"`
 	Error2 string        `json:"error_2"`
+	Logs1  []string      `json:"logs_1"`
+	Logs2  []string      `json:"logs_2"`
 }
 
 // Lang по сути ENUM с доступными языками
@@ -108,7 +110,7 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 		return errors.Wrap(err, "unknown slug")
 	}
 
-	info, states, result, err := t.Test(task.Code1, task.Code2, game)
+	info, states, logs1, logs2, result, err := t.Test(task.Code1, task.Code2, game)
 	if err != nil {
 		firstErr := err
 		if errors.Cause(firstErr) == ErrTimeount {
@@ -140,6 +142,8 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 			Winner: result.GetWinner(),
 			Error1: result.Error1(),
 			Error2: result.Error2(),
+			Logs1:  logs1,
+			Logs2:  logs2,
 		})
 	if err != nil {
 		return errors.Wrap(err, "can not send result state")
