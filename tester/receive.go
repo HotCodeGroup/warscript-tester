@@ -50,7 +50,7 @@ type TestTask struct {
 
 const (
 	pongSlug = "pong"
-	atodSlug = "atod"
+	atodSlug = "2atod"
 )
 
 var (
@@ -104,6 +104,8 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 		game = &pong.Pong{}
 	} else if task.GameSlug == atodSlug {
 		game = &atod.Atod{}
+	} else {
+		return errors.Wrap(err, "unknown slug")
 	}
 
 	info, states, result, err := t.Test(task.Code1, task.Code2, game)
