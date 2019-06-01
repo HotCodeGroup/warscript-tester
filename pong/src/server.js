@@ -87,11 +87,11 @@ const server = http.createServer((req, res) => {
             }
 
 
-            let wasError = false
+            let errorText = ""
             try {
                 p(me, enemy, ball, game, cnsl)
             } catch (err) {
-                wasError = true
+                errorText = `ERROR: ${err.name}; ${err.message};`
                 cnsl.logs.push(`ERROR: ${err.name}; ${err.message};`)
             }
 
@@ -100,7 +100,7 @@ const server = http.createServer((req, res) => {
                 "enemy": enemy,
                 "ball": ball,
                 "console": cnsl.logs,
-                "was_error": wasError
+                "error": errorText
             })
             res.setHeader('Content-Type', 'application/json');
             res.end(resp)

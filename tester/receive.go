@@ -31,6 +31,8 @@ type StatusResult struct {
 	Info   games.Info    `json:"info"`
 	States []games.State `json:"states"`
 	Winner int           `json:"result"`
+	Error1 string        `json:"error_1"`
+	Error2 string        `json:"error_2"`
 }
 
 // Lang по сути ENUM с доступными языками
@@ -129,6 +131,8 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 			Info:   info,
 			States: states,
 			Winner: result.GetWinner(),
+			Error1: result.Error1(),
+			Error2: result.Error2(),
 		})
 	if err != nil {
 		return errors.Wrap(err, "can not send result state")

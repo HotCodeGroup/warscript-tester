@@ -2,7 +2,6 @@ package pong
 
 import (
 	"encoding/json"
-	"strings"
 
 	"github.com/HotCodeGroup/warscript-tester/games"
 
@@ -27,10 +26,10 @@ type Pong struct {
 	ball      Movable
 	player1   Movable
 	player2   Movable
-
-	winner       int
-	isEnded      bool
-	occuredError *games.GameError
+	winner    int
+	isEnded   bool
+	Error1    string
+	Error2    string
 }
 
 const (
@@ -94,12 +93,12 @@ type gameShotInner struct {
 }
 
 type shot struct {
-	Me       shotInner     `json:"me"`
-	Enemy    shotInner     `json:"enemy"`
-	Ball     shotInner     `json:"ball"`
-	Game     gameShotInner `json:"game"`
-	Console  []string      `json:"console"`
-	WasError bool          `json:"was_error"`
+	Me      shotInner     `json:"me"`
+	Enemy   shotInner     `json:"enemy"`
+	Ball    shotInner     `json:"ball"`
+	Game    gameShotInner `json:"game"`
+	Console []string      `json:"console"`
+	Error   string        `json:"error"`
 }
 
 func (pong *Pong) createShot1() shot {
@@ -184,30 +183,28 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 	err1 := json.Unmarshal(shot1, &s1)
 	if err1 != nil {
 		pong.isEnded = true
-		pong.occuredError = games.ErrPlayer1Fail
+		pong.Error1 = games.ErrPlayer1Fail.Msg
 		return errors.Wrap(err1, games.ErrPlayer1Fail.Error())
 	}
 
-	if s1.WasError {
+	if s1.Error != "" {
 		pong.isEnded = true
-		pong.occuredError = &games.GameError{
-			Msg: strings.Join(s1.Console, "\n"),
-		}
+		pong.Error1 = s1.Error
+		pong.winner = 2
 		return
 	}
 
 	err2 := json.Unmarshal(shot2, &s2)
 	if err2 != nil {
 		pong.isEnded = true
-		pong.occuredError = games.ErrPlayer2Fail
+		pong.Error2 = games.ErrPlayer2Fail.Msg
 		return errors.Wrap(err2, games.ErrPlayer2Fail.Error())
 	}
 
-	if s2.WasError {
+	if s2.Error != "" {
 		pong.isEnded = true
-		pong.occuredError = &games.GameError{
-			Msg: strings.Join(s2.Console, "\n"),
-		}
+		pong.Error2 = s2.Error
+		pong.winner = 1
 		return
 	}
 
@@ -252,7 +249,8 @@ func (pong *Pong) GetResult() (result games.Result) {
 
 	return &Result{
 		Winner: pong.winner,
-		Error:  pong.occuredError,
+		Err1:   pong.Error1,
+		Err2:   pong.Error2,
 		Player1: object2D{
 			X: pong.player1.x / pong.width,
 			Y: pong.player1.y / pong.height,

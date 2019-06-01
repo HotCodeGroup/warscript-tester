@@ -24,23 +24,6 @@ type SendCodeResponce struct {
 	Error string `json:"error"`
 }
 
-func (s *SendCodeResponce) JSON() []byte {
-	// ну тут всего лишь строка)
-	body, _ := json.Marshal(struct {
-		Console []string `json:"console"`
-	}{
-		Console: []string{
-			s.Error,
-		},
-	})
-
-	return body
-}
-
-func (s *SendCodeResponce) GetWinner() int {
-	return 3
-}
-
 // NewTester создание нового объекта тестировщика
 func NewTester(d *docker.Client, ch *amqp.Channel) *Tester {
 	return &Tester{
@@ -106,8 +89,7 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (info games.In
 	}
 
 	if respSendCodeStatus1.Error != "" {
-		states = append(states, respSendCodeStatus1)
-		result = respSendCodeStatus1
+		returnErr = errors.New("player1 load code error: " + respSendCodeStatus1.Error)
 		return
 	}
 
@@ -125,8 +107,7 @@ func (t *Tester) Test(rawCode1, rawCode2 string, game games.Game) (info games.In
 	}
 
 	if respSendCodeStatus2.Error != "" {
-		states = append(states, respSendCodeStatus2)
-		result = respSendCodeStatus2
+		returnErr = errors.New("player2 load code error: " + respSendCodeStatus2.Error)
 		return
 	}
 

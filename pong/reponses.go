@@ -2,8 +2,6 @@ package pong
 
 import (
 	"encoding/json"
-
-	"github.com/HotCodeGroup/warscript-tester/games"
 )
 
 type object2D struct {
@@ -51,13 +49,22 @@ type Result struct {
 	Player2 object2D `json:"player_2"`
 	Ball    object2D `json:"ball"`
 	Winner  int      `json:"winner"`
-	Error   *games.GameError
-	Message string `json:"msg,omitempty"`
+	Err1    string   `json:"error_1"`
+	Err2    string   `json:"error_2"`
+	Message string   `json:"msg,omitempty"`
 }
 
 // GetWinner - returns winner of the game
 func (res *Result) GetWinner() int {
 	return res.Winner
+}
+
+func (res *Result) Error1() string {
+	return res.Err1
+}
+
+func (res *Result) Error2() string {
+	return res.Err2
 }
 
 // JSON - returns marshaled json

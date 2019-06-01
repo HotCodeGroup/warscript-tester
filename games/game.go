@@ -14,6 +14,8 @@ type Info interface {
 type Result interface {
 	State
 	GetWinner() int
+	Error1() string
+	Error2() string
 }
 
 // Game interface for working with different games
@@ -29,7 +31,7 @@ type Game interface {
 
 // GameError ошибка, возникшая при проверки игры
 type GameError struct {
-	Msg string
+	Msg string `json:"message"`
 }
 
 func (e *GameError) Error() string {
