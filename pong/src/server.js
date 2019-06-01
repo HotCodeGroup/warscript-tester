@@ -4,7 +4,7 @@ const loadcode = "/loadcode"
 const run = "/run"
 
 let ready = false
-let p = new Function("me", "enemy", "ball", "game", "console", "{}");
+let p = new Function("me", "enemy", "ball", "game", "console", "memory", "{}");
 
 const http = require('http');
 const {
@@ -23,7 +23,7 @@ const server = http.createServer((req, res) => {
 
             let errorText = ""
             try {
-                p = new Function("me", "enemy", "ball", "game", "console", params.code);
+                p = new Function("me", "enemy", "ball", "game", "console", "memory", params.code);
             } catch (err) {
                 errorText = `ERROR: ${err.name}; ${err.message};`
             }
@@ -86,10 +86,10 @@ const server = http.createServer((req, res) => {
                 this.logs.push(msg)
             }
 
-
+            let memory = params.memory
             let errorText = ""
             try {
-                p(me, enemy, ball, game, cnsl)
+                p(me, enemy, ball, game, cnsl, memory)
             } catch (err) {
                 errorText = `[TICK: ${10000 - params.game.ticks_left}] ERROR: ${err.name}; ${err.message};`
                 cnsl.logs.push(`[TICK: ${10000 - params.game.ticks_left}] ERROR: ${err.name}; ${err.message};`)
@@ -100,6 +100,7 @@ const server = http.createServer((req, res) => {
                 "enemy": enemy,
                 "ball": ball,
                 "console": cnsl.logs,
+                "memory": memory,
                 "error": errorText
             })
             res.setHeader('Content-Type', 'application/json');

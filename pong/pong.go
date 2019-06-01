@@ -30,6 +30,8 @@ type Pong struct {
 	isEnded   bool
 	Error1    string
 	Error2    string
+	Memory1   json.RawMessage
+	Memory2   json.RawMessage
 }
 
 const (
@@ -93,12 +95,13 @@ type gameShotInner struct {
 }
 
 type shot struct {
-	Me      shotInner     `json:"me"`
-	Enemy   shotInner     `json:"enemy"`
-	Ball    shotInner     `json:"ball"`
-	Game    gameShotInner `json:"game"`
-	Console []string      `json:"console"`
-	Error   string        `json:"error"`
+	Me      shotInner       `json:"me"`
+	Enemy   shotInner       `json:"enemy"`
+	Ball    shotInner       `json:"ball"`
+	Game    gameShotInner   `json:"game"`
+	Memory  json.RawMessage `json:"memory"`
+	Console []string        `json:"console"`
+	Error   string          `json:"error"`
 }
 
 func (pong *Pong) createShot1() shot {
@@ -132,6 +135,7 @@ func (pong *Pong) createShot1() shot {
 			Width:     pong.width,
 			TicksLeft: pong.ticksLeft,
 		},
+		Memory: pong.Memory1,
 	}
 }
 
@@ -166,6 +170,7 @@ func (pong *Pong) createShot2() shot {
 			Width:     pong.width,
 			TicksLeft: pong.ticksLeft,
 		},
+		Memory: pong.Memory2,
 	}
 }
 
@@ -194,6 +199,9 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 		return
 	}
 
+	// состояния
+	pong.Memory1 = s1.Memory
+
 	err2 := json.Unmarshal(shot2, &s2)
 	if err2 != nil {
 		pong.isEnded = true
@@ -208,6 +216,7 @@ func (pong *Pong) SaveSnapshots(shot1, shot2 []byte) (gameErr error) {
 		return
 	}
 
+	pong.Memory2 = s2.Memory
 	pong.loadSnapShots(&s1, &s2)
 	return nil
 }
