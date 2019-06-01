@@ -126,6 +126,16 @@ func (a *Atod) moveProjectiles() {
 					}
 				}
 			}
+			for _, u := range a.player2Units {
+				if p.unitIntersect(u) {
+					coll = true
+					u.health -= p.getDamage()
+					if u.health <= 0 {
+						u.carriedFlag.carrier = nil
+						u.carriedFlag = nil
+					}
+				}
+			}
 			if !coll &&
 				p.getX() < a.heihgt && 0 < p.getX() &&
 				p.getY() < a.width && 0 < p.getY() {
