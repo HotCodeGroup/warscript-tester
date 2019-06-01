@@ -120,7 +120,17 @@ func (a *Atod) moveProjectiles() {
 				if p.unitIntersect(u) {
 					coll = true
 					u.health -= p.getDamage()
-					if u.health <= 0 {
+					if u.health <= 0 && u.carriedFlag != nil {
+						u.carriedFlag.carrier = nil
+						u.carriedFlag = nil
+					}
+				}
+			}
+			for _, u := range a.player2Units {
+				if p.unitIntersect(u) {
+					coll = true
+					u.health -= p.getDamage()
+					if u.health <= 0 && u.carriedFlag != nil {
 						u.carriedFlag.carrier = nil
 						u.carriedFlag = nil
 					}
@@ -229,18 +239,18 @@ func (a *Atod) checkWinner() int {
 
 			f1 = append(f1, f)
 		}
-		a.flags1 = f1
 	}
+	a.flags1 = f1
 	f2 := make([]*flag, 0, 0)
 	for _, f := range a.flags2 {
 		if !(f.carrier == nil &&
-			math.Abs(f.x-a.dropzone2.x) < a.dropzone1.radius &&
-			math.Abs(f.y-a.dropzone2.y) < a.dropzone1.radius) {
+			math.Abs(f.x-a.dropzone1.x) < a.dropzone1.radius &&
+			math.Abs(f.y-a.dropzone1.y) < a.dropzone1.radius) {
 
 			f2 = append(f2, f)
 		}
-		a.flags2 = f2
 	}
+	a.flags2 = f2
 	p1ct := len(a.player1Units)
 	for _, u := range a.player1Units {
 		if u.health <= 0 {
