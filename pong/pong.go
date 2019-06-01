@@ -72,6 +72,10 @@ func (pong *Pong) Init() {
 		vX:     0,
 		vY:     0,
 	}
+
+	// Создаём пустые оюъекты
+	pong.Memory1 = []byte(`{}`)
+	pong.Memory2 = []byte(`{}`)
 }
 
 // Images - returns names of images
