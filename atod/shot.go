@@ -80,6 +80,12 @@ func (s *projectileShot) inverse(height float64, width float64) {
 	s.VY = -s.VY
 }
 
+type gameShotInner struct {
+	Height    float64 `json:"height"`
+	Width     float64 `json:"width"`
+	TicksLeft int     `json:"ticks_left"`
+}
+
 type shot struct {
 	Dropzone      dropzoneShot     `json:"dropzone"`
 	EnemyDropzone dropzoneShot     `json:"enemy_dropzone"`
@@ -89,6 +95,10 @@ type shot struct {
 	EnemyUnits    []unitShot       `json:"enemy_units"`
 	Flags         []flagShot       `json:"flags"`
 	EnemyFlags    []flagShot       `json:"enemy_flags"`
+
+	Game    gameShotInner `json:"game"`
+	Console []string      `json:"console"`
+	Error   string        `json:"error"`
 }
 
 func (a *Atod) createShot1() shot {
@@ -101,6 +111,14 @@ func (a *Atod) createShot1() shot {
 		EnemyUnits:    unitsToShot(a.player2Units),
 		Flags:         flagsToShot(a.flags1),
 		EnemyFlags:    flagsToShot(a.flags2),
+
+		Game: gameShotInner{
+			Height:    a.heihgt,
+			Width:     a.width,
+			TicksLeft: a.ticksLeft,
+		},
+		Console: nil,
+		Error:   "",
 	}
 }
 
@@ -114,6 +132,14 @@ func (a *Atod) createShot2() shot {
 		EnemyUnits:    unitsToShot(a.player1Units),
 		Flags:         flagsToShot(a.flags2),
 		EnemyFlags:    flagsToShot(a.flags1),
+
+		Game: gameShotInner{
+			Height:    a.heihgt,
+			Width:     a.width,
+			TicksLeft: a.ticksLeft,
+		},
+		Console: nil,
+		Error:   "",
 	}
 	s.Dropzone.inverse(a.heihgt, a.width)
 	s.EnemyDropzone.inverse(a.heihgt, a.width)

@@ -37,11 +37,29 @@ func (a *Atod) SaveSnapshots(shot1, shot2 []byte) error {
 		return errors.Wrap(err1, games.ErrPlayer1Fail.Error())
 	}
 
+	if s1.Error != "" {
+		a.isEnded = true
+		a.Error1 = s1.Error
+		a.winner = 2
+		return nil
+	}
+
 	err2 := json.Unmarshal(shot2, &s2)
 	if err2 != nil {
 		a.isEnded = true
 		a.Error2 = games.ErrPlayer2Fail.Msg
 		return errors.Wrap(err2, games.ErrPlayer2Fail.Error())
+	}
+
+	if s2.Error != "" {
+		a.isEnded = true
+		a.Error2 = s2.Error
+		if s1.Error == "" {
+			a.winner = 1
+		} else {
+			a.winner = 0
+		}
+		return nil
 	}
 
 	a.loadSnapShots(&s1, &s2)
