@@ -235,8 +235,8 @@ func (a *Atod) checkWinner() int {
 
 			f1 = append(f1, f)
 		}
-		a.flags1 = f1
 	}
+	a.flags1 = f1
 	f2 := make([]*flag, 0, 0)
 	for _, f := range a.flags2 {
 		if !(f.carrier == nil &&
@@ -245,8 +245,8 @@ func (a *Atod) checkWinner() int {
 
 			f2 = append(f2, f)
 		}
-		a.flags2 = f2
 	}
+	a.flags2 = f2
 	p1ct := len(a.player1Units)
 	for _, u := range a.player1Units {
 		if u.health <= 0 {
