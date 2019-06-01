@@ -120,7 +120,7 @@ func (a *Atod) moveProjectiles() {
 				if p.unitIntersect(u) {
 					coll = true
 					u.health -= p.getDamage()
-					if u.health <= 0 {
+					if u.health <= 0 && u.carriedFlag != nil {
 						u.carriedFlag.carrier = nil
 						u.carriedFlag = nil
 					}
@@ -130,7 +130,7 @@ func (a *Atod) moveProjectiles() {
 				if p.unitIntersect(u) {
 					coll = true
 					u.health -= p.getDamage()
-					if u.health <= 0 {
+					if u.health <= 0 && u.carriedFlag != nil {
 						u.carriedFlag.carrier = nil
 						u.carriedFlag = nil
 					}
