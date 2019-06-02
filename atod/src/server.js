@@ -55,6 +55,30 @@ const server = http.createServer((req, res) => {
             let projectiles = params.projectiles
             let game = params.game
 
+            for (let u of units) {
+                u.setMoveVector = function (x, y, speed) {
+                    let nSpeed = speed / Math.sqrt(x * x + y * y);
+                    if (isNaN(nSpeed) || nSpeed === Infinity) {
+                        nSpeed = 0;
+                    }
+
+                    this.vX = x * nSpeed;
+                    this.vY = y * nSpeed;
+                }
+
+                u.takeFlag = function () {
+                    this.is_carring_flag = true;
+                }
+
+                u.shot = function (x, y) {
+                    this.bullet_dir_x = x;
+                    this.bullet_dir_y = y;
+                }
+
+                u.dropFlag = function () {
+                    this.is_carring_flag = false;
+                }
+            }
 
             let cnsl = {}
             cnsl.logs = []
