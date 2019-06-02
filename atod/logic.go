@@ -137,8 +137,8 @@ func (a *Atod) moveProjectiles() {
 				}
 			}
 			if !coll &&
-				p.getX() < a.heihgt && 0 < p.getX() &&
-				p.getY() < a.width && 0 < p.getY() {
+				p.getX() < a.width && 0 < p.getX() &&
+				p.getY() < a.heihgt && 0 < p.getY() {
 				ps = append(ps, p)
 			}
 		}
