@@ -2,12 +2,10 @@ package atod
 
 import (
 	"math"
-	"math/rand"
-	"time"
 )
 
 const (
-	stdObstAmount     = 10
+	stdObstAmount     = 0
 	stdHeight         = 1000
 	stdWidth          = 2000
 	stdNoObstacleZone = 350
@@ -20,6 +18,13 @@ const (
 	stdFlag1PosY      = 100
 	stdFlag2PosX      = 100
 	stdFlag2PosY      = 900
+
+	stdObstHeight = 200
+	stdObstWidth  = 200
+	stdObst1PosX  = 500
+	stdObst1PosY  = 300
+	stdObst2PosX  = 500
+	stdObst2PosY  = 700
 )
 
 func stdField() *Atod {
@@ -73,30 +78,32 @@ func stdField() *Atod {
 }
 
 func stdObstacles() []*obstacle {
-	obstacles := make([]*obstacle, 0, stdObstAmount*2)
-	randS := rand.NewSource(time.Now().UnixNano())
-	for i := 0; i < stdObstAmount; i++ {
-		height := float64(randS.Int63() % int64(stdHeight/20))
-		width := float64(randS.Int63() % int64(stdWidth/20))
-		x := float64(randS.Int63() % int64(stdHeight))
-		y := stdNoObstacleZone + float64(randS.Int63()%int64(stdWidth-stdNoObstacleZone*2))
-
-		obstacles = append(obstacles, &obstacle{
-			width:  width,
-			height: height,
-			x:      x,
-			y:      y,
-		})
-
-		obstacles = append(obstacles, &obstacle{
-			width:  width,
-			height: height,
-			x:      stdHeight - x,
-			y:      stdWidth - y,
-		})
+	return []*obstacle{
+		{
+			width:  stdObstWidth,
+			height: stdObstHeight,
+			x:      stdObst1PosX,
+			y:      stdObst1PosY,
+		},
+		{
+			width:  stdObstWidth,
+			height: stdObstHeight,
+			x:      stdObst2PosX,
+			y:      stdObst2PosY,
+		},
+		{
+			width:  stdObstWidth,
+			height: stdObstHeight,
+			x:      stdWidth - stdObst1PosX,
+			y:      stdHeight - stdObst1PosY,
+		},
+		{
+			width:  stdObstWidth,
+			height: stdObstHeight,
+			x:      stdWidth - stdObst2PosX,
+			y:      stdHeight - stdObst2PosY,
+		},
 	}
-
-	return obstacles
 }
 
 type stdBullet struct {
