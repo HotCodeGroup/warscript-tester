@@ -160,6 +160,12 @@ func (b *stdBullet) obstacleIntersect(o *obstacle) bool {
 	if p, _, _ := sectionsInter(bulletLine, obstacleLine4); p {
 		return true
 	}
+
+	if between(b.x, b.y, o.x-deltX, o.x+deltX, o.y-deltY, o.y+deltY) ||
+		between(b.prevX, b.prevY, o.x-deltX, o.x+deltX, o.y-deltY, o.y+deltY) {
+		return true
+	}
+
 	return false
 }
 
