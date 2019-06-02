@@ -15,6 +15,11 @@ func between(x0 float64, y0 float64, x1 float64, y1 float64, x2 float64, y2 floa
 
 func circleSectionInter(cX float64, cY float64, cR float64,
 	x1 float64, y1 float64, x2 float64, y2 float64) (int, float64, float64, float64, float64) {
+	if ((x1-cX)*(x1-cX)+(y1-cY)*(y1-cY) < cR*cR) ||
+		((x2-cX)*(x2-cX)+(y2-cY)*(y2-cY) < cR*cR) {
+		return 1, 0, 0, 0, 0
+	}
+
 	x1 -= cX
 	x2 -= cX
 	y1 -= cY
