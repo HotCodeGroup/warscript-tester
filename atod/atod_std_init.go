@@ -161,8 +161,8 @@ func (b *stdBullet) move() bool {
 		return false
 	}
 	b.distLeft -= b.v
-	b.prevX = b.vX
-	b.prevY = b.vY
+	b.prevX = b.x
+	b.prevY = b.y
 	if b.distLeft <= 0 {
 		newV := b.distLeft + b.v
 		b.vX *= newV / b.v
@@ -204,9 +204,9 @@ func bulletProducer(u *unit) func(float64, float64) projectile {
 			return nil
 		}
 
-		mod := math.Sqrt(x*x+y*y) + lEPS
-		dirX := mod / x
-		dirY := mod / y
+		mod := math.Sqrt(x*x+y*y) * (1 - lEPS)
+		dirX := x / mod
+		dirY := y / mod
 
 		return &stdBullet{
 			v:        u.bulletSpeed,

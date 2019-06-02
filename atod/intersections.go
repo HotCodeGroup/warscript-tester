@@ -4,6 +4,15 @@ import (
 	"math"
 )
 
+func between(x0 float64, y0 float64, x1 float64, y1 float64, x2 float64, y2 float64) bool {
+	maxX := math.Max(x1, x2)
+	minX := math.Min(x1, x2)
+	maxY := math.Max(y1, y2)
+	minY := math.Min(y1, y2)
+	return minX < x0 && x0 < maxX &&
+		minY < y0 && y0 < maxY
+}
+
 func circleSectionInter(cX float64, cY float64, cR float64,
 	x1 float64, y1 float64, x2 float64, y2 float64) (int, float64, float64, float64, float64) {
 	x1 -= cX
@@ -19,7 +28,11 @@ func circleSectionInter(cX float64, cY float64, cR float64,
 	if c*c > cR*cR*(a*a+b*b)+lEPS {
 		return 0, 0, 0, 0, 0
 	} else if math.Abs(c*c-cR*cR*(a*a+b*b)) < lEPS {
-		return 1, x0, y0, 0, 0
+		if between(x0, y0, x1, y1, x2, y2) {
+			return 1, x0, y0, 0, 0
+		} else {
+			return 0, 0, 0, 0, 0
+		}
 	} else {
 		d := cR*cR - c*c/(a*a+b*b)
 		mult := math.Sqrt(d / (a*a + b*b))
@@ -27,7 +40,19 @@ func circleSectionInter(cX float64, cY float64, cR float64,
 		bx := x0 - b*mult
 		ay := y0 - a*mult
 		by := y0 + a*mult
-		return 2, ax, ay, bx, by
+
+		aR := between(ax, ay, x1, y1, x2, y2)
+		bR := between(bx, by, x1, y1, x2, y2)
+		if aR && bR {
+			return 2, ax, ay, bx, by
+		}
+		if aR {
+			return 1, ax, ay, 0, 0
+		}
+		if bR {
+			return 1, bx, by, 0, 0
+		}
+		return 0, 0, 0, 0, 0
 	}
 }
 

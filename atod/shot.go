@@ -52,6 +52,11 @@ func (s *unitShot) inverse(height float64, width float64) {
 	s.Y = height - s.Y
 	s.VX = -s.VX
 	s.VY = -s.VY
+
+	s.BulletDirX = -s.BulletDirX
+	s.BulletDirY = -s.BulletDirY
+	s.SpecialDirX = -s.SpecialDirX
+	s.SpecialDirY = -s.SpecialDirY
 }
 
 type dropzoneShot struct {

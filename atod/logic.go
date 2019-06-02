@@ -152,7 +152,9 @@ func (a *Atod) moveUnits(un []*unit) {
 		if u.health <= 0 {
 			continue
 		}
-
+		if u.reloadLeft > 0 {
+			u.reloadLeft--
+		}
 		deltaX := u.vX
 		deltaY := u.vY
 		movedY := true
