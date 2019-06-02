@@ -15,7 +15,7 @@ const (
 )
 
 func (a *Atod) Init() {
-	a = stdField()
+	*a = *stdField()
 }
 
 func (a *Atod) Images() (string, string) {
