@@ -2,6 +2,7 @@ package tester
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/HotCodeGroup/warscript-tester/atod"
 
@@ -154,6 +155,12 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 			Logs2:  Logs{Logs: logs2},
 		})
 	if err != nil {
+		for _, s := range states {
+			_, err := json.Marshal(s)
+			if err != nil {
+				fmt.Printf("%s\n%+v\n", err.Error(), s)
+			}
+		}
 		d.Ack(false)
 		return errors.Wrap(err, "can not send result state")
 	}
