@@ -34,7 +34,6 @@ func (a *Atod) loadSnapShots(s1, s2 *shot) {
 		a.isEnded = true
 	}
 	if a.ticksLeft == 0 {
-		a.winner = 0
 		a.isEnded = true
 	}
 }
