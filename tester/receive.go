@@ -35,8 +35,12 @@ type StatusResult struct {
 	Winner int           `json:"result"`
 	Error1 string        `json:"error_1"`
 	Error2 string        `json:"error_2"`
-	Logs1  []string      `json:"logs_1"`
-	Logs2  []string      `json:"logs_2"`
+	Logs1  Logs          `json:"logs_1"`
+	Logs2  Logs          `json:"logs_2"`
+}
+
+type Logs struct {
+	Logs []string `json:"logs"`
 }
 
 // Lang по сути ENUM с доступными языками
@@ -142,8 +146,8 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 			Winner: result.GetWinner(),
 			Error1: result.Error1(),
 			Error2: result.Error2(),
-			Logs1:  logs1,
-			Logs2:  logs2,
+			Logs1:  Logs{Logs: logs1},
+			Logs2:  Logs{Logs: logs2},
 		})
 	if err != nil {
 		return errors.Wrap(err, "can not send result state")
