@@ -96,12 +96,14 @@ func sendReplyTo(ch *amqp.Channel, to, correlationID, t string, message interfac
 func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 	err := sendReplyTo(t.ch, d.ReplyTo, d.CorrelationId, "status", receivedMessage)
 	if err != nil {
+		d.Ack(false)
 		return errors.Wrap(err, "can not send receive confirmation")
 	}
 
 	task := &TestTask{}
 	err = json.Unmarshal(d.Body, task)
 	if err != nil {
+		d.Ack(false)
 		return errors.Wrap(err, "can not unmarshal delivery body")
 	}
 
@@ -111,6 +113,7 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 	} else if task.GameSlug == atodSlug {
 		game = &atod.Atod{}
 	} else {
+		d.Ack(false)
 		return errors.Wrap(err, "unknown slug")
 	}
 
@@ -128,6 +131,7 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 
 		err = sendReplyTo(t.ch, d.ReplyTo, d.CorrelationId, "error", &StatusError{firstErr.Error()})
 		if err != nil {
+			d.Ack(false)
 			return errors.Wrap(err, "can not send internal error")
 		}
 
@@ -150,6 +154,7 @@ func (t *Tester) ReceiveVerifyRPC(d amqp.Delivery) error {
 			Logs2:  Logs{Logs: logs2},
 		})
 	if err != nil {
+		d.Ack(false)
 		return errors.Wrap(err, "can not send result state")
 	}
 
