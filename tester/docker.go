@@ -120,7 +120,7 @@ func (p *PlayerContainer) SendState(state []byte) ([]byte, error) {
 // SendRequest отправка запроса в контенер
 func (p *PlayerContainer) SendRequest(body []byte, endpoint string) ([]byte, error) {
 	portBinding := p.container.HostConfig.PortBindings[p.Port][0]
-	resp, err := http.Post(fmt.Sprintf("http://%s:%s/%s", portBinding.HostIP,
+	resp, err := p.httpClient.Post(fmt.Sprintf("http://%s:%s/%s", portBinding.HostIP,
 		portBinding.HostPort, endpoint), "application/json", bytes.NewReader(body))
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to send request to p%d docker", p.PlayerID)
