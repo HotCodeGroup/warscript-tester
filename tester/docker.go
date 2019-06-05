@@ -32,6 +32,8 @@ type PlayerContainer struct {
 	Port         docker.Port
 	container    *docker.Container
 	dockerClient *docker.Client
+
+	httpClient *http.Client
 }
 
 // NewPlayerContainer создание и запуск нового докер контейнера
@@ -90,6 +92,9 @@ func NewPlayerContainer(playerID, port int, imageName string,
 		Port:         docker.Port("5000/tcp"),
 		container:    pContainer,
 		dockerClient: dockerClient,
+		httpClient: &http.Client{
+			Timeout: 30 * time.Second,
+		},
 	}, nil
 }
 
